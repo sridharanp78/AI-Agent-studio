@@ -1,0 +1,13 @@
+{
+  "name": "ai-agent-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A self-hosted AI agent studio with a visual workspace and OpenAI-compatible API backend.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" }
+}
