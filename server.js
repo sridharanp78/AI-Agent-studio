@@ -46,7 +46,11 @@ function mime(file) {
 }
 async function staticFile(req, res, pathname) {
   const requested = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
-  const file = path.resolve(ROOT, "." + requested);
+  const normalized = path.posix.normalize(requested);
+  if (normalized.split("/").some(part => part.startsWith(".")) || ["/server.js", "/package.json"].includes(normalized) || normalized.startsWith("/data/")) {
+    return json(res, 404, { error: "Not found" });
+  }
+  const file = path.resolve(ROOT, "." + normalized);
   if (!file.startsWith(ROOT + path.sep) && file !== ROOT) return json(res, 403, { error: "Forbidden" });
   try {
     const body = await readFile(file);
