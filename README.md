@@ -78,7 +78,7 @@ These tools run inside the Node.js backend. The Slack tool is a real external ac
 
 ## MCP server discovery
 The Integrations and Tools & models pages can discover tools exposed by administrator-configured MCP servers. Configure these backend-only variables:
-- `MCP_SERVERS_JSON` — JSON array, for example `[{"name":"Internal MCP","url":"https://mcp.example.com/mcp","tokenEnv":"INTERNAL_MCP_TOKEN"}]`.
+- `MCP_SERVERS_JSON` — JSON array, for example `[{"name":"Internal MCP","url":"https://mcp.example.com/mcp","tokenEnv":"INTERNAL_MCP_TOKEN","allowedTools":["read_status"]}]`.
 - `MCP_ALLOWED_HOSTS` — comma-separated exact hostnames allowed to receive MCP requests, for example `mcp.example.com`.
 - `INTERNAL_MCP_TOKEN` — optional bearer token referenced by `tokenEnv`; keep it in the hosting provider's secret settings.
 
