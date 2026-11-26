@@ -331,7 +331,7 @@ async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   const pathname = url.pathname;
   if (req.method === "GET" && pathname === "/api/health") {
-    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), mcpConfigured: Boolean(process.env.MCP_SERVERS_JSON && process.env.MCP_ALLOWED_HOSTS), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
+    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), mcpConfigured: Boolean(process.env.MCP_SERVERS_JSON && process.env.MCP_ALLOWED_HOSTS), knowledgeConfigured: Array.isArray(db.knowledge) && db.knowledge.length > 0, embeddingsConfigured: Boolean(process.env.OPENAI_API_KEY), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
   }
   const accessUser = process.env.APP_ACCESS_USER;
   const accessPassword = process.env.APP_ACCESS_PASSWORD;
