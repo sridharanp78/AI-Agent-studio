@@ -171,6 +171,22 @@ async function invokeMcpTool(node, context) {
   if (called.payload.result?.isError) throw new Error("MCP tool reported an execution error.");
   return {tool:"mcp_tool",server:serverName,name:toolName,result:called.payload.result||{},context};
 }
+async function getAgentMcpDefinitions(agent) {
+  const permissions=Array.isArray(agent?.mcpTools)?agent.mcpTools.slice(0,20):[];
+  if(!permissions.length)return [];
+  const servers=getMcpConfig(),output=[];
+  for(const permission of permissions){
+    const server=servers.find(x=>x.name===safeString(permission.server,80)),name=safeString(permission.tool,100);
+    if(!server||!name||!server.allowedTools.includes(name))continue;
+    const discovered=await discoverMcpTools(server),tool=discovered.tools.find(x=>x.name===name);
+    if(tool)output.push({server:server.name,toolName:name,definition:{type:"function",function:{name:"mcp_"+(output.length),description:(tool.description||"MCP tool")+" (server: "+server.name+", tool: "+name+")",parameters:tool.inputSchema?.type==="object"?tool.inputSchema:{type:"object",properties:{}}}}});
+  }
+  return output;
+}
+async function runAgentMcpTool(agent, selected, args) {
+  if(!(agent?.mcpTools||[]).some(p=>p.server===selected.server&&p.tool===selected.toolName))throw new Error("This agent is not permitted to use that MCP tool.");
+  return invokeMcpTool({toolName:"mcp_tool",mcpServerName:selected.server,mcpToolName:selected.toolName,toolInput:JSON.stringify(args||{})},{});
+}
 async function discoverMcpTools(server) {
   const init = await mcpRequest(server, { jsonrpc:"2.0", id:1, method:"initialize", params:{ protocolVersion:"2025-03-26", capabilities:{}, clientInfo:{ name:"AI Agent Studio", version:"1.0.0" } } });
   await mcpRequest(server, { jsonrpc:"2.0", method:"notifications/initialized" }, init.sessionId);
@@ -321,28 +337,39 @@ async function handle(req, res) {
       db.workflows.unshift(workflow); await saveDB(); return json(res, 201, { workflow });
     }
     if (req.method === "POST" && pathname === "/api/chat") {
-      const body = await readBody(req);
-      const message = safeString(body.message, 12000);
-      if (!message) return json(res, 400, { error: "Message is required." });
-      const agent = db.agents.find(a => a.id === body.agentId) || null;
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) return json(res, 503, { error: "AI provider is not configured yet. Add OPENAI_API_KEY to your .env file, then restart the server." });
-      const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-      const model = safeString(body.model, 100) || agent?.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
-      const messages = Array.isArray(body.history) ? body.history.slice(-20).filter(m => ["user", "assistant"].includes(m.role)).map(m => ({ role: m.role, content: safeString(m.content, 12000) })) : [];
-      messages.push({ role: "user", content: message });
-      const upstream = await fetch(base + "/chat/completions", {
-        method: "POST", headers: { "authorization": "Bearer " + apiKey, "content-type": "application/json" },
-        body: JSON.stringify({ model, temperature: 0.7, messages: [{ role: "system", content: agent?.instructions || "You are a helpful AI assistant. Be accurate, clear, and concise." }, ...messages] })
-      });
-      const result = await upstream.json().catch(() => ({}));
-      if (!upstream.ok) return json(res, upstream.status === 429 ? 429 : 502, { error: result.error?.message || "The AI provider request failed." });
-      const reply = result.choices?.[0]?.message?.content;
-      if (!reply) return json(res, 502, { error: "The AI provider returned an empty response." });
-      if (agent) { agent.runs = (agent.runs || 0) + 1; agent.updatedAt = new Date().toISOString(); await saveDB(); }
-      db.runs.unshift({ id: randomUUID(), agentId: agent?.id || null, model, createdAt: new Date().toISOString(), status: "completed" });
-      db.runs = db.runs.slice(0, 500); await saveDB();
-      return json(res, 200, { reply, model, usage: result.usage || null });
+      const body=await readBody(req),message=safeString(body.message,12000);
+      if(!message)return json(res,400,{error:"Message is required."});
+      const agent=db.agents.find(a=>a.id===body.agentId)||null,apiKey=process.env.OPENAI_API_KEY;
+      if(!apiKey)return json(res,503,{error:"AI provider is not configured yet. Add OPENAI_API_KEY to your backend environment."});
+      const base=(process.env.OPENAI_BASE_URL||"https://api.openai.com/v1").replace(/\/$/,""),model=safeString(body.model,100)||agent?.model||process.env.OPENAI_MODEL||"gpt-4o-mini";
+      const history=Array.isArray(body.history)?body.history.slice(-20).filter(m=>["user","assistant"].includes(m.role)).map(m=>({role:m.role,content:safeString(m.content,12000)})):[];
+      history.push({role:"user",content:message});
+      let selectedTools=[];try{selectedTools=await getAgentMcpDefinitions(agent)}catch(error){return json(res,400,{error:"Could not prepare this agent's MCP tools: "+error.message})}
+      const tools=selectedTools.map(x=>x.definition),conversation=[{role:"system",content:agent?.instructions||"You are a helpful AI assistant. Be accurate, clear, and concise. Use connected tools only when needed."},...history];
+      let reply="",usage=null;const toolActivity=[];
+      for(let round=0;round<4;round++){
+        const requestBody={model,temperature:0.7,messages:conversation};
+        if(tools.length){requestBody.tools=tools;requestBody.tool_choice="auto";}
+        const upstream=await fetch(base+"/chat/completions",{method:"POST",signal:AbortSignal.timeout(60000),headers:{authorization:"Bearer "+apiKey,"content-type":"application/json"},body:JSON.stringify(requestBody)});
+        const result=await upstream.json().catch(()=>({}));
+        if(!upstream.ok)return json(res,upstream.status===429?429:502,{error:result.error?.message||"The AI provider request failed."});
+        const assistant=result.choices?.[0]?.message;
+        if(!assistant)return json(res,502,{error:"The AI provider returned an empty response."});
+        usage=result.usage||usage;
+        if(!Array.isArray(assistant.tool_calls)||!assistant.tool_calls.length){reply=assistant.content||"";break;}
+        conversation.push({role:"assistant",content:assistant.content||null,tool_calls:assistant.tool_calls});
+        for(const call of assistant.tool_calls){
+          const index=Number(String(call.function?.name||"").replace("mcp_","")),selected=selectedTools[index];
+          if(!selected)return json(res,502,{error:"The model requested an unknown MCP tool."});
+          let args={};try{args=JSON.parse(call.function.arguments||"{}")}catch{return json(res,502,{error:"The model returned invalid MCP tool arguments."})}
+          try{const result=await runAgentMcpTool(agent,selected,args);toolActivity.push({server:selected.server,tool:selected.toolName,status:"completed"});conversation.push({role:"tool",tool_call_id:call.id,content:JSON.stringify(result.result||result).slice(0,12000)})}
+          catch(error){toolActivity.push({server:selected.server,tool:selected.toolName,status:"failed",error:error.message});conversation.push({role:"tool",tool_call_id:call.id,content:JSON.stringify({error:error.message})})}
+        }
+      }
+      if(!reply)return json(res,502,{error:"Tool loop reached its limit. Ask a more focused question or reduce the number of connected tools."});
+      if(agent){agent.runs=(agent.runs||0)+1;agent.updatedAt=new Date().toISOString();await saveDB()}
+      db.runs.unshift({id:randomUUID(),agentId:agent?.id||null,model,createdAt:new Date().toISOString(),status:"completed",tools:toolActivity});db.runs=db.runs.slice(0,500);await saveDB();
+      return json(res,200,{reply,model,usage,toolActivity});
     }
     return json(res, 404, { error: "API route not found." });
   }
