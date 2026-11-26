@@ -37,3 +37,6 @@ The backend supports providers exposing an OpenAI-compatible `/chat/completions`
 
 ## Current scope
 The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat uses the configured provider. Workflow execution, external integrations, authentication, team permissions, vector search/RAG, and production deployment hardening are not implemented yet.
+
+## Security note
+This starter does not yet include user authentication, workspace isolation, or production-grade authorization. Run it on your own machine or behind a trusted private network only. Do not expose the API directly to the public internet until authentication, authorization, HTTPS, secret management, and deployment hardening have been added. The server deliberately does not serve `.env`, `server.js`, or the local `data/` directory as static files.
