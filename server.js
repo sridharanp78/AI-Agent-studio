@@ -96,11 +96,23 @@ function safeCalculate(expression) {
   function sum() { let v=product(); while (["+","+ -"].includes(clean[i]) || clean[i]==="-") { const op=clean[i++], b=product(); v=op==="+"?v+b:v-b; } return v; }
   const value=sum(); if (i!==clean.length || !Number.isFinite(value)) throw new Error("Invalid or incomplete calculator expression."); return value;
 }
-function runBuiltinTool(node, context, inputItems) {
+async function runBuiltinTool(node, context, inputItems) {
   const tool = safeString(node.toolName, 40), value = safeString(node.toolInput, 2000);
   if (tool === "calculator") return { tool, result: safeCalculate(value), context };
   if (tool === "json_lookup") { const result=valueAtPath(context, value); return { tool, path:value, result: result === undefined ? null : result, context }; }
   if (tool === "text_template") { const result=value.replace(/\{\{\s*([\w.$\[\]]+)\s*\}\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); }); return { tool, result, context }; }
+  if (tool === "slack_webhook") {
+    const configured = process.env.SLACK_WEBHOOK_URL;
+    if (!configured) throw new Error("SLACK_WEBHOOK_URL is not configured on the backend.");
+    let endpoint; try { endpoint = new URL(configured); } catch { throw new Error("SLACK_WEBHOOK_URL is invalid."); }
+    if (endpoint.protocol !== "https:" || endpoint.hostname !== "hooks.slack.com" || endpoint.username || endpoint.password) throw new Error("Slack webhook must use an HTTPS hooks.slack.com URL.");
+    const message = value.replace(/\\{\\{\\s*([\\w.$\\[\\]]+)\\s*\\}\\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
+    if (!message) throw new Error("Add message text to the Slack tool input.");
+    const response = await fetch(endpoint, { method:"POST", redirect:"error", signal:AbortSignal.timeout(10000), headers:{"content-type":"application/json"}, body:JSON.stringify({text:message}) });
+    const responseText = await response.text();
+    if (!response.ok || responseText.trim() !== "ok") throw new Error("Slack webhook failed with HTTP " + response.status + ".");
+    return { tool, delivered:true, message, context };
+  }
   if (tool === "combine") return { tool, result: inputItems.map(x=>x.data), context };
   throw new Error("Select a supported built-in tool before running this node.");
 }
@@ -139,7 +151,7 @@ async function executeWorkflow(body) {
       detail = "Condition evaluated " + (matched ? "TRUE" : "FALSE") + ".";
     } else if (type === "Transform") { output = { transformed: true, items: inputItems.map(x => x.data), context }; detail = "Wrapped incoming items; configure a transform tool for custom mapping."; }
     else if (type === "Loop") { output = { iterations: 1, items: inputItems.map(x => x.data), context }; detail = "One iteration completed; loop execution is currently a single pass."; }
-    else { output = runBuiltinTool(node, context, inputItems); detail = "Executed the selected built-in tool on the backend. No external service was called."; }
+    else { output = await runBuiltinTool(node, context, inputItems); detail = "Executed the selected built-in tool on the backend. No external service was called."; }
     outputs.set(id, output);
     steps.push({ nodeId: id, name: safeString(node.title, 120) || type, type, status, detail, duration: Date.now() - stepStart, inputs: inputItems, output });
     if (status === "blocked") break;
