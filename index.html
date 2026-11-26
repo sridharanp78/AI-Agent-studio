@@ -114,6 +114,64 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
 
 /* Playground session actions */
 .playground-header-actions{display:flex;align-items:center;gap:10px}.playground-header-actions .btn{font-size:10px;padding:7px 10px}.playground-ready{white-space:nowrap}@media(max-width:600px){.playground-header-actions{align-items:flex-end;flex-direction:column;gap:6px}}
+
+/* Global mobile layout correction */
+@media(max-width:700px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .app{display:block;width:100%;min-width:0;overflow-x:clip}
+  .app>.main,.main{width:100%;min-width:0;max-width:100%;margin:0}
+  .topbar{width:100%;min-width:0;gap:8px;padding:0 12px}
+  .topbar-left{min-width:0;flex:1;overflow:hidden}
+  .crumb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .top-actions{flex:none;min-width:0}
+  .content{width:100%;max-width:100%;min-width:0;margin:0;padding:18px 12px 30px;overflow-x:clip}
+  .page-head{width:100%;min-width:0;gap:10px}
+  .page-head>div,.page-head>section{min-width:0;max-width:100%}
+  .page-head .btn,.page-head button{max-width:100%;white-space:normal}
+  .cards,.agent-grid,.dashboard-grid,.editor-layout,.model-grid,.agent-kb,.knowledge-stats,.settings-layout,.docs-layout,.billing-grid,.crew-grid,.schedule-overview{grid-template-columns:minmax(0,1fr)!important}
+  .cards>* ,.agent-grid>* ,.dashboard-grid>* ,.editor-layout>* ,.panel,.card{min-width:0;max-width:100%}
+  .panel{padding:14px}
+  .panel-head{align-items:flex-start;flex-wrap:wrap;min-width:0}
+  .toolbar,.integration-toolbar,.knowledge-searchbar{align-items:stretch;flex-direction:column;min-width:0}
+  .toolbar>* ,.tabs,.search,.field input,.field select,.field textarea,.field{max-width:100%;min-width:0}
+  input,select,textarea,button{max-width:100%}
+  table{display:block;max-width:100%;overflow-x:auto}
+  .playground-shell{width:100%;min-width:0;grid-template-columns:minmax(0,1fr);gap:12px}
+  .playground-left,.playground-main{width:100%;min-width:0;max-width:100%}
+  .playground-left{order:0}
+  .playground-main{padding:0;min-height:0}
+  .playground-nav-panel,.playground-settings{width:100%;min-width:0}
+  .play-agent-list{grid-template-columns:minmax(0,1fr)!important}
+  .playground-chat-header{width:100%;min-width:0;gap:10px;flex-wrap:wrap}
+  .playground-current{min-width:0;flex:1}
+  .playground-current>div:last-child{min-width:0}
+  .playground-current h3,.playground-current .panel-sub{overflow-wrap:anywhere}
+  .playground-header-actions{flex-direction:row;align-items:center;flex-wrap:wrap}
+  .chat-stage{width:100%;min-width:0;min-height:360px;padding:14px 12px;overflow-wrap:anywhere}
+  .chat-stage .bubble{max-width:100%;overflow-wrap:anywhere;white-space:pre-wrap}
+  .chat-compose-wrap{width:100%;min-width:0;padding:0 0 12px}
+  .chat-compose{width:100%;min-width:0;display:flex;align-items:flex-end;gap:6px}
+  .chat-compose textarea{width:100%;min-width:0;max-width:100%;font-size:16px}
+  .chat-compose-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:9px}
+  .prompt-suggestions{grid-template-columns:minmax(0,1fr)!important}
+  .play-history-row{min-width:0}
+  .play-history-item{min-width:0;flex:1}
+  .playground-ready{white-space:normal}
+  .workflow-canvas,.canvas-wrap,.canvas-area{max-width:100%;overflow:auto}
+  .form-grid{grid-template-columns:minmax(0,1fr)!important}
+  .field.full{grid-column:1/-1}
+  .resource-row{align-items:flex-start;flex-wrap:wrap}
+  .resource-row .btn{margin-left:0}
+  .drive-file{grid-template-columns:minmax(0,1fr) auto;min-width:0}
+}
+@media(max-width:380px){
+  .content{padding-left:9px;padding-right:9px}
+  .topbar{padding-left:9px;padding-right:9px}
+  .page-head h1{font-size:21px}
+  .playground-header-actions{width:100%;justify-content:space-between}
+  .chat-compose{padding:6px}
+  .chat-compose button{flex:none}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
