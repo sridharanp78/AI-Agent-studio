@@ -25,6 +25,7 @@ No third-party npm packages are required. Agent and workflow records are stored 
 - `PATCH /api/agents/:id` — update an agent.
 - `DELETE /api/agents/:id` — delete an agent.
 - `GET /api/workflows` and `POST /api/workflows` — list/create workflows.
+- `POST /api/workflows/run` — execute a workflow graph on the backend. Trigger, Agent, Condition, Transform and one-pass Loop nodes are supported. Agent nodes call the configured OpenAI-compatible provider. Tool Call nodes stop safely with a `blocked` result until an integration is connected.
 - `POST /api/chat` — send a message to the configured OpenAI-compatible chat completions endpoint.
 
 Example chat body:
@@ -35,8 +36,24 @@ Example chat body:
 ## Provider configuration
 The backend supports providers exposing an OpenAI-compatible `/chat/completions` endpoint. Set `OPENAI_BASE_URL` to the provider's API base URL and `OPENAI_API_KEY` to its secret key. Keep secrets in the server-side `.env`; never place them in frontend code or commit the real `.env` file.
 
+## Workflow execution
+The workflow canvas offers two run modes: a local preview (simulation only) and backend execution. Backend execution sends the current nodes, directed links, and JSON test input to `POST /api/workflows/run`. Graphs are checked for cycles and processed in dependency order. Condition nodes support `contains`, `equals`, `not_equals`, `greater_than`, `less_than`, `exists`, `starts_with`, `ends_with`, `is_empty`, `is_true`, and `is_false`; outgoing Condition links use `branch: "true"` or `branch: "false"`. Agent nodes can select a saved workspace agent and optionally override its model. Run responses include per-step status, duration, inputs, outputs, and a run ID. Workflow execution records are stored in the local JSON database.
+
+Example request body:
+```json
+{
+  "name": "Approval routing",
+  "nodes": [
+    { "id": "trigger", "type": "Trigger", "title": "New request" },
+    { "id": "agent", "type": "Agent", "title": "Review request", "agentId": "YOUR_AGENT_ID" }
+  ],
+  "links": [{ "from": "trigger", "to": "agent" }],
+  "input": { "status": "pending", "amount": 125 }
+}
+```
+
 ## Current scope
-The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat uses the configured provider. Workflow execution, external integrations, authentication, team permissions, vector search/RAG, and production deployment hardening are not implemented yet.
+The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat and Agent workflow nodes use the configured OpenAI-compatible provider when the backend is deployed and configured. External tool/MCP execution, team permissions, vector search/RAG, and production deployment hardening are not implemented yet.
 
 ## Security note
 This starter does not yet include user authentication, workspace isolation, or production-grade authorization. Run it on your own machine or behind a trusted private network only. Do not expose the API directly to the public internet until authentication, authorization, HTTPS, secret management, and deployment hardening have been added. The server deliberately does not serve `.env`, `server.js`, or the local `data/` directory as static files.
