@@ -115,7 +115,7 @@ function getMcpConfig() {
     let url; try { url = new URL(item?.url); } catch { throw new Error("MCP server URL is invalid for " + name + "."); }
     if (url.protocol !== "https:" || url.username || url.password || !allowed.has(url.hostname.toLowerCase())) throw new Error("MCP server " + name + " must use HTTPS and a hostname listed in MCP_ALLOWED_HOSTS.");
     const tokenEnv = /^[A-Z][A-Z0-9_]{2,80}$/.test(item?.tokenEnv || "") ? item.tokenEnv : "";
-    return { name, url: url.toString(), hostname: url.hostname.toLowerCase(), tokenEnv };
+    return { name, url: url.toString(), hostname: url.hostname.toLowerCase(), tokenEnv, allowedTools: Array.isArray(item.allowedTools) ? item.allowedTools.filter(x => typeof x === "string").slice(0,50) : [] };
   });
 }
 async function mcpRequest(server, message, sessionId = "") {
@@ -135,6 +135,41 @@ async function mcpRequest(server, message, sessionId = "") {
   } else payload = textBody ? JSON.parse(textBody) : {};
   if (payload.error) throw new Error(payload.error.message || "MCP JSON-RPC error.");
   return { payload, sessionId: response.headers.get("mcp-session-id") || sessionId };
+}
+function interpolateMcpValue(value, context) {
+  if (typeof value === "string") return value.replace(/\\{\\{\\s*([\\w.$\\[\\]]+)\\s*\\}\\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
+  if (Array.isArray(value)) return value.map(v=>interpolateMcpValue(v,context));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,interpolateMcpValue(v,context)]));
+  return value;
+}
+function validateMcpArguments(args, schema) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("MCP tool arguments must be a JSON object.");
+  const properties = schema?.properties && typeof schema.properties === "object" ? schema.properties : {};
+  for (const key of schema?.required || []) if (!(key in args)) throw new Error("Missing required MCP argument: " + key);
+  for (const [key,value] of Object.entries(args)) {
+    const rule=properties[key]; if (!rule) continue;
+    const type=rule.type;
+    if (type==="string" && typeof value!=="string" || type==="number" && (typeof value!=="number"||!Number.isFinite(value)) || type==="integer" && !Number.isInteger(value) || type==="boolean" && typeof value!=="boolean" || type==="array" && !Array.isArray(value) || type==="object" && (!value||typeof value!=="object"||Array.isArray(value))) throw new Error("MCP argument " + key + " must be " + type + ".");
+  }
+}
+async function invokeMcpTool(node, context) {
+  const serverName=safeString(node.mcpServerName,80), toolName=safeString(node.mcpToolName,100);
+  if (!serverName || !toolName) throw new Error("Choose an MCP server and tool name in the node settings.");
+  const server=getMcpConfig().find(x=>x.name===serverName);
+  if (!server) throw new Error("MCP server is not configured on the backend.");
+  if (!server.allowedTools.includes(toolName)) throw new Error("This MCP tool is not enabled in that server's allowedTools list.");
+  let args={}; try { args=JSON.parse(safeString(node.toolInput,10000)||"{}"); } catch { throw new Error("MCP tool arguments must be valid JSON."); }
+  args=interpolateMcpValue(args,context);
+  if (JSON.stringify(args).length>10000) throw new Error("MCP arguments exceed 10 KB.");
+  const init=await mcpRequest(server,{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:"2025-03-26",capabilities:{},clientInfo:{name:"AI Agent Studio",version:"1.0.0"}}});
+  await mcpRequest(server,{jsonrpc:"2.0",method:"notifications/initialized"},init.sessionId);
+  const listed=await mcpRequest(server,{jsonrpc:"2.0",id:2,method:"tools/list",params:{}},init.sessionId);
+  const definition=(listed.payload.result?.tools||[]).find(t=>t.name===toolName);
+  if (!definition) throw new Error("The selected tool is no longer available on this MCP server.");
+  validateMcpArguments(args,definition.inputSchema||{});
+  const called=await mcpRequest(server,{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:toolName,arguments:args}},init.sessionId);
+  if (called.payload.result?.isError) throw new Error("MCP tool reported an execution error.");
+  return {tool:"mcp_tool",server:serverName,name:toolName,result:called.payload.result||{},context};
 }
 async function discoverMcpTools(server) {
   const init = await mcpRequest(server, { jsonrpc:"2.0", id:1, method:"initialize", params:{ protocolVersion:"2025-03-26", capabilities:{}, clientInfo:{ name:"AI Agent Studio", version:"1.0.0" } } });
@@ -169,6 +204,7 @@ async function runBuiltinTool(node, context, inputItems) {
     if (!response.ok || responseText.trim() !== "ok") throw new Error("Slack webhook failed with HTTP " + response.status + ".");
     return { tool, delivered:true, message, context };
   }
+  if (tool === "mcp_tool") return await invokeMcpTool(node, context);
   if (tool === "combine") return { tool, result: inputItems.map(x=>x.data), context };
   throw new Error("Select a supported built-in tool before running this node.");
 }
