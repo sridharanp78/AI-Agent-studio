@@ -102,4 +102,4 @@ The model can choose among only the tools assigned to that agent. The backend va
 - `POST /api/knowledge` accepts `{ "name": "guide.pdf", "mimeType": "application/pdf", "contentBase64": "..." }` (5 MB per file).
 - `DELETE /api/knowledge/:id` removes a document and detaches it from agents.
 - Agent create/update accepts `knowledgeIds: ["document-id"]`.
-- Chat retrieves up to five relevant chunks from the selected agent's assigned documents. Configure `OPENAI_API_KEY`; embeddings use `text-embedding-3-small` by default and can be changed with `OPENAI_EMBEDDING_MODEL`. If no key is configured, retrieval falls back to keyword matching.
+- Chat retrieves up to five relevant chunks from the selected agent's assigned documents. Configure `OPENAI_API_KEY`; embeddings use `text-embedding-3-small` by default and can be changed with `OPENAI_EMBEDDING_MODEL`. Embedding requests are batched in groups of 64. If no key is configured, retrieval falls back to keyword matching. Embedding API usage may incur provider charges.
