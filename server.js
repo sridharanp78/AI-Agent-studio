@@ -271,7 +271,7 @@ async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   const pathname = url.pathname;
   if (req.method === "GET" && pathname === "/api/health") {
-    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
+    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), mcpConfigured: Boolean(process.env.MCP_SERVERS_JSON && process.env.MCP_ALLOWED_HOSTS), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
   }
   const accessUser = process.env.APP_ACCESS_USER;
   const accessPassword = process.env.APP_ACCESS_PASSWORD;
@@ -358,6 +358,7 @@ async function handle(req, res) {
         if(!assistant)return json(res,502,{error:"The AI provider returned an empty response."});
         usage=result.usage||usage;
         if(!Array.isArray(assistant.tool_calls)||!assistant.tool_calls.length){reply=assistant.content||"";break;}
+        if(assistant.tool_calls.length>5)return json(res,400,{error:"The model requested too many tools in one turn. Limit tool use to five calls per response."});
         conversation.push({role:"assistant",content:assistant.content||null,tool_calls:assistant.tool_calls});
         for(const call of assistant.tool_calls){
           const index=Number(String(call.function?.name||"").replace("mcp_","")),selected=selectedTools[index];
