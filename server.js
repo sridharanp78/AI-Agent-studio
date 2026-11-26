@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import net from "node:net";
+import { Pool } from "pg";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, "data");
@@ -14,16 +15,55 @@ const HOST = process.env.HOST || "0.0.0.0";
 const MAX_BODY = 8 * 1024 * 1024;
 const rate = new Map();
 
-async function loadDB() {
+const pgPool = process.env.DATABASE_URL ? new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: Number(process.env.PG_POOL_MAX || 5),
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  ssl: process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : undefined
+}) : null;
+if (pgPool) pgPool.on("error", error => console.error("[postgres pool]", error.message));
+
+async function readFileDB() {
   await mkdir(DATA_DIR, { recursive: true });
   try { return JSON.parse(await readFile(DB_FILE, "utf8")); }
-  catch { const initial = { agents: [], workflows: [], runs: [], knowledge: [] }; await saveDB(initial); return initial; }
+  catch { return { agents: [], workflows: [], runs: [], knowledge: [] }; }
+}
+async function persistKnowledgeDocument(doc) {
+  if (!pgPool) return;
+  await pgPool.query(
+    "INSERT INTO knowledge_documents (id, metadata, chunks) VALUES ($1, $2::jsonb, $3::jsonb) ON CONFLICT (id) DO UPDATE SET metadata = EXCLUDED.metadata, chunks = EXCLUDED.chunks",
+    [doc.id, JSON.stringify({name:doc.name,mimeType:doc.mimeType,size:doc.size,createdAt:doc.createdAt,chunkCount:doc.chunkCount}), JSON.stringify(doc.chunks || [])]
+  );
+}
+async function loadDB() {
+  if (!pgPool) return readFileDB();
+  await pgPool.query("CREATE TABLE IF NOT EXISTS app_state (id integer PRIMARY KEY CHECK (id = 1), payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())");
+  await pgPool.query("CREATE TABLE IF NOT EXISTS knowledge_documents (id text PRIMARY KEY, metadata jsonb NOT NULL, chunks jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now())");
+  const saved = await pgPool.query("SELECT payload FROM app_state WHERE id = 1");
+  let state;
+  if (saved.rowCount) state = saved.rows[0].payload;
+  else {
+    state = await readFileDB();
+    const legacyDocs = Array.isArray(state.knowledge) ? state.knowledge : [];
+    delete state.knowledge;
+    await pgPool.query("INSERT INTO app_state (id, payload) VALUES (1, $1::jsonb) ON CONFLICT (id) DO NOTHING", [JSON.stringify(state)]);
+    for (const doc of legacyDocs) await persistKnowledgeDocument(doc);
+  }
+  const documents = await pgPool.query("SELECT id, metadata, chunks FROM knowledge_documents ORDER BY created_at DESC");
+  return {...state, knowledge: documents.rows.map(row => ({id:row.id,...row.metadata,chunks:row.chunks||[]}))};
 }
 let db = await loadDB();
 if (!Array.isArray(db.knowledge)) db.knowledge = [];
 async function saveDB(next = db) {
   db = next;
-  await writeFile(DB_FILE, JSON.stringify(db, null, 2), "utf8");
+  if (pgPool) {
+    const state = {...db}; delete state.knowledge;
+    await pgPool.query("INSERT INTO app_state (id, payload, updated_at) VALUES (1, $1::jsonb, now()) ON CONFLICT (id) DO UPDATE SET payload = EXCLUDED.payload, updated_at = now()", [JSON.stringify(state)]);
+  } else {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(DB_FILE, JSON.stringify(db, null, 2), "utf8");
+  }
 }
 function json(res, status, data) {
   res.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
@@ -331,7 +371,7 @@ async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   const pathname = url.pathname;
   if (req.method === "GET" && pathname === "/api/health") {
-    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), mcpConfigured: Boolean(process.env.MCP_SERVERS_JSON && process.env.MCP_ALLOWED_HOSTS), knowledgeConfigured: Array.isArray(db.knowledge) && db.knowledge.length > 0, embeddingsConfigured: Boolean(process.env.OPENAI_API_KEY), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
+    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), slackConfigured: Boolean(process.env.SLACK_WEBHOOK_URL), mcpConfigured: Boolean(process.env.MCP_SERVERS_JSON && process.env.MCP_ALLOWED_HOSTS), knowledgeConfigured: Array.isArray(db.knowledge) && db.knowledge.length > 0, storage: pgPool ? "postgres" : "ephemeral-json", embeddingsConfigured: Boolean(process.env.OPENAI_API_KEY), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
   }
   const accessUser = process.env.APP_ACCESS_USER;
   const accessPassword = process.env.APP_ACCESS_PASSWORD;
@@ -370,7 +410,7 @@ async function handle(req, res) {
       const pieces=splitKnowledgeText(extracted);if(!pieces.length)return json(res,422,{error:"No indexable text was found."});
       let vectors=null;try{vectors=await createEmbeddings(pieces)}catch(error){return json(res,502,{error:"Could not create document embeddings: "+error.message})}
       const doc={id:randomUUID(),name,mimeType,size:buffer.length,createdAt:new Date().toISOString(),chunkCount:pieces.length,chunks:pieces.map((text,index)=>({index,text,embedding:vectors?.[index]||null}))};
-      db.knowledge.unshift(doc);await saveDB();
+      db.knowledge.unshift(doc);if(pgPool)await persistKnowledgeDocument(doc);await saveDB();
       return json(res,201,{document:{id:doc.id,name:doc.name,mimeType:doc.mimeType,size:doc.size,createdAt:doc.createdAt,chunkCount:doc.chunkCount},embeddingMode:vectors?"vector":"keyword"});
     }
     const knowledgeMatch=pathname.match(/^\/api\/knowledge\/([\w-]+)$/);
@@ -378,6 +418,7 @@ async function handle(req, res) {
       const before=db.knowledge.length;db.knowledge=db.knowledge.filter(d=>d.id!==knowledgeMatch[1]);
       if(before===db.knowledge.length)return json(res,404,{error:"Knowledge document not found."});
       for(const agent of db.agents)agent.knowledgeIds=(agent.knowledgeIds||[]).filter(id=>id!==knowledgeMatch[1]);
+      if(pgPool)await pgPool.query("DELETE FROM knowledge_documents WHERE id = $1",[knowledgeMatch[1]]);
       await saveDB();return json(res,200,{deleted:true});
     }
     if (req.method === "GET" && pathname === "/api/agents") return json(res, 200, { agents: db.agents });
