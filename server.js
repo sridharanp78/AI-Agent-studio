@@ -87,6 +87,23 @@ async function executeAgentNode(node, agent, input) {
   if (!reply) throw new Error("AI provider returned an empty response.");
   return { agent: agent?.name || null, model, reply, usage: result.usage || null };
 }
+function safeCalculate(expression) {
+  const tokens = String(expression || "").match(/\\d+(?:\\.\\d+)?|[()+*/%-]|\\s+/g);
+  if (!tokens || tokens.join("").replace(/\\s/g, "") !== String(expression || "").replace(/\\s/g, "")) throw new Error("Calculator accepts only numbers and + - * / % parentheses.");
+  const clean = tokens.filter(t => !/^\\s+$/.test(t)); let i = 0;
+  function atom() { const t = clean[i++]; if (t === "(") { const v = sum(); if (clean[i++] !== ")") throw new Error("Missing closing parenthesis."); return v; } if (t === "-") return -atom(); if (t === "+") return atom(); const n = Number(t); if (!Number.isFinite(n)) throw new Error("Invalid calculator expression."); return n; }
+  function product() { let v = atom(); while (["*","/","%"].includes(clean[i])) { const op=clean[i++], b=atom(); if ((op==="/"||op==="%") && b===0) throw new Error("Division by zero."); v=op==="*" ? v*b : op==="/" ? v/b : v%b; } return v; }
+  function sum() { let v=product(); while (["+","+ -"].includes(clean[i]) || clean[i]==="-") { const op=clean[i++], b=product(); v=op==="+"?v+b:v-b; } return v; }
+  const value=sum(); if (i!==clean.length || !Number.isFinite(value)) throw new Error("Invalid or incomplete calculator expression."); return value;
+}
+function runBuiltinTool(node, context, inputItems) {
+  const tool = safeString(node.toolName, 40), value = safeString(node.toolInput, 2000);
+  if (tool === "calculator") return { tool, result: safeCalculate(value), context };
+  if (tool === "json_lookup") { const result=valueAtPath(context, value); return { tool, path:value, result: result === undefined ? null : result, context }; }
+  if (tool === "text_template") { const result=value.replace(/\\{\\{\\s*([\\w.$\\[\\]]+)\\s*\\}\\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); }); return { tool, result, context }; }
+  if (tool === "combine") return { tool, result: inputItems.map(x=>x.data), context };
+  throw new Error("Select a supported built-in tool before running this node.");
+}
 async function executeWorkflow(body) {
   const nodes = Array.isArray(body.nodes) ? body.nodes.slice(0, 100) : [];
   const links = Array.isArray(body.links) ? body.links.slice(0, 300) : [];
@@ -122,7 +139,7 @@ async function executeWorkflow(body) {
       detail = "Condition evaluated " + (matched ? "TRUE" : "FALSE") + ".";
     } else if (type === "Transform") { output = { transformed: true, items: inputItems.map(x => x.data), context }; detail = "Wrapped incoming items; configure a transform tool for custom mapping."; }
     else if (type === "Loop") { output = { iterations: 1, items: inputItems.map(x => x.data), context }; detail = "One iteration completed; loop execution is currently a single pass."; }
-    else { status = "blocked"; detail = "Tool node has no connected integration yet. No external action was sent."; output = { status: "not_configured", message: detail, context }; }
+    else { output = runBuiltinTool(node, context, inputItems); detail = "Executed the selected built-in tool on the backend. No external service was called."; }
     outputs.set(id, output);
     steps.push({ nodeId: id, name: safeString(node.title, 120) || type, type, status, detail, duration: Date.now() - stepStart, inputs: inputItems, output });
     if (status === "blocked") break;
