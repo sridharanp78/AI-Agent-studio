@@ -130,7 +130,7 @@ async function mcpRequest(server, message, sessionId = "") {
   const textBody = await response.text();
   let payload;
   if (contentType.includes("text/event-stream")) {
-    const data = textBody.split(/\\r?\\n/).filter(line => line.startsWith("data:")).map(line => line.slice(5).trim()).filter(Boolean);
+    const data = textBody.split(/\r?\n/).filter(line => line.startsWith("data:")).map(line => line.slice(5).trim()).filter(Boolean);
     payload = data.length ? JSON.parse(data[data.length - 1]) : {};
   } else payload = textBody ? JSON.parse(textBody) : {};
   if (payload.error) throw new Error(payload.error.message || "MCP JSON-RPC error.");
@@ -197,7 +197,7 @@ async function runBuiltinTool(node, context, inputItems) {
     if (!configured) throw new Error("SLACK_WEBHOOK_URL is not configured on the backend.");
     let endpoint; try { endpoint = new URL(configured); } catch { throw new Error("SLACK_WEBHOOK_URL is invalid."); }
     if (endpoint.protocol !== "https:" || endpoint.hostname !== "hooks.slack.com" || endpoint.username || endpoint.password) throw new Error("Slack webhook must use an HTTPS hooks.slack.com URL.");
-    const message = value.replace(/\{\{\\s*([\w.$\[\]]+)\\s*\}\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
+    const message = value.replace(/\{\{\s*([\w.$\[\]]+)\s*\}\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
     if (!message) throw new Error("Add message text to the Slack tool input.");
     const response = await fetch(endpoint, { method:"POST", redirect:"error", signal:AbortSignal.timeout(10000), headers:{"content-type":"application/json"}, body:JSON.stringify({text:message}) });
     const responseText = await response.text();
