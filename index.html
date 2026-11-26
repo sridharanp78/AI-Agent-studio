@@ -275,6 +275,23 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
  .canvas{min-height:640px;overflow:auto}
  .canvas .node{width:210px;max-width:calc(100% - 28px)}
 }
+
+/* Workflow nodes: explicit input/output ports and interaction states */
+.canvas .node{position:absolute;cursor:grab;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.canvas .node:before{left:0;top:12px;bottom:12px;width:3px}
+.canvas .node:after{right:-7px;top:calc(50% - 6px);width:12px;height:12px;border:2px solid #a99aff;background:#0b1220;box-shadow:0 0 0 4px rgba(169,153,255,.12),0 0 14px rgba(169,153,255,.22)}
+.canvas .node .node-type{margin-bottom:10px}
+.canvas .node .node-type:after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.65}
+.canvas .node.node-selected{transform:translateY(-1px);border-color:#b2a5ff;box-shadow:0 0 0 3px rgba(169,153,255,.18),0 16px 36px rgba(0,0,0,.4)}
+.canvas .node.node-dragging{transform:scale(1.015);cursor:grabbing}
+.canvas .node[data-kind="trigger"]:after{border-color:#55d6a8}
+.canvas .node[data-kind="condition"]:after{border-color:#e9b65c}
+.canvas .node[data-kind="tool-call"]:after{border-color:#56b9ed}
+.canvas .node[data-kind="transform"]:after{border-color:#e58ac1}
+.canvas .node[data-kind="loop"]:after{border-color:#68c7d3}
+.canvas .workflow-links path{stroke-width:2.8}
+.canvas-tools #connectNodes.primary{background:#7863df;border-color:#a99aff;color:#fff;box-shadow:0 0 0 3px rgba(169,153,255,.14)}
+@media(max-width:700px){.canvas .node{min-height:108px}.canvas .node:after{right:-6px}}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
