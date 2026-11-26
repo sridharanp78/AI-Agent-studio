@@ -58,6 +58,78 @@ async function staticFile(req, res, pathname) {
     res.end(body);
   } catch { json(res, 404, { error: "Not found" }); }
 }
+function valueAtPath(obj, path) { return String(path || "").replace(/\\[(\\d+)\\]/g, ".$1").split(".").filter(Boolean).reduce((v, key) => v == null ? undefined : v[key], obj); }
+function getContext(value) { return value && typeof value === "object" ? (value.context && typeof value.context === "object" ? value.context : value) : {}; }
+function testCondition(actual, operator, expected) {
+  if (operator === "exists") return actual !== undefined && actual !== null;
+  if (operator === "is_empty") return actual === undefined || actual === null || actual === "" || (Array.isArray(actual) && actual.length === 0) || (typeof actual === "object" && !Array.isArray(actual) && Object.keys(actual).length === 0);
+  if (operator === "is_true") return actual === true || actual === 1 || String(actual).toLowerCase() === "true";
+  if (operator === "is_false") return actual === false || actual === 0 || String(actual).toLowerCase() === "false";
+  if (operator === "equals") return actual !== undefined && actual !== null && String(actual) === String(expected);
+  if (operator === "not_equals") return actual !== undefined && actual !== null && String(actual) !== String(expected);
+  if (operator === "contains") return Array.isArray(actual) ? actual.some(v => String(v).toLowerCase() === String(expected).toLowerCase()) : actual !== undefined && String(actual).toLowerCase().includes(String(expected).toLowerCase());
+  if (operator === "starts_with") return actual !== undefined && String(actual).toLowerCase().startsWith(String(expected).toLowerCase());
+  if (operator === "ends_with") return actual !== undefined && String(actual).toLowerCase().endsWith(String(expected).toLowerCase());
+  if (operator === "greater_than" || operator === "less_than") { const a = Number(actual), b = Number(expected); return actual !== undefined && actual !== null && String(actual).trim() !== "" && Number.isFinite(a) && Number.isFinite(b) && (operator === "greater_than" ? a > b : a < b); }
+  throw new Error("Unsupported condition operator: " + operator);
+}
+async function executeAgentNode(node, agent, input) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured on the backend.");
+  const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\\/$/, "");
+  const model = safeString(node.model, 100) || agent?.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const instructions = agent?.instructions || "You are a helpful AI workflow agent. Follow the task and return a useful result.";
+  const task = "Execute this workflow step. Use the input JSON as source data. Return a concise, useful result.\\n\\nNode: " + safeString(node.title, 120) + "\\nDescription: " + safeString(node.detail, 2000) + "\\nInput JSON:\\n" + JSON.stringify(input).slice(0, 20000);
+  const upstream = await fetch(base + "/chat/completions", { method: "POST", signal: AbortSignal.timeout(45000), headers: { authorization: "Bearer " + apiKey, "content-type": "application/json" }, body: JSON.stringify({ model, temperature: 0.3, messages: [{ role: "system", content: instructions }, { role: "user", content: task }] }) });
+  const result = await upstream.json().catch(() => ({}));
+  if (!upstream.ok) throw new Error(result.error?.message || "AI provider request failed with status " + upstream.status);
+  const reply = result.choices?.[0]?.message?.content;
+  if (!reply) throw new Error("AI provider returned an empty response.");
+  return { agent: agent?.name || null, model, reply, usage: result.usage || null };
+}
+async function executeWorkflow(body) {
+  const nodes = Array.isArray(body.nodes) ? body.nodes.slice(0, 100) : [];
+  const links = Array.isArray(body.links) ? body.links.slice(0, 300) : [];
+  const input = body.input && typeof body.input === "object" && !Array.isArray(body.input) ? body.input : {};
+  if (!nodes.length) throw new Error("Add at least one node before running.");
+  if (JSON.stringify(input).length > 20000) throw new Error("Workflow input exceeds 20 KB.");
+  const byId = new Map();
+  for (const n of nodes) { const id = safeString(String(n?.id ?? ""), 100); if (!id || byId.has(id)) throw new Error("Workflow nodes must have unique IDs."); if (!["Trigger", "Agent", "Condition", "Tool call", "Transform", "Loop"].includes(n.type)) throw new Error("Unsupported workflow node type."); byId.set(id, { ...n, id }); }
+  const incoming = new Map(nodes.map(n => [String(n.id), []])), outgoing = new Map(nodes.map(n => [String(n.id), []]));
+  for (const link of links) { const from = String(link?.from ?? ""), to = String(link?.to ?? ""); if (!byId.has(from) || !byId.has(to) || from === to) throw new Error("A workflow connection references an invalid node."); outgoing.get(from).push(to); incoming.get(to).push(from); }
+  const indegree = new Map([...byId.keys()].map(id => [id, incoming.get(id).length]));
+  const queue = [...byId.keys()].filter(id => indegree.get(id) === 0), order = [];
+  while (queue.length) { const id = queue.shift(); order.push(id); for (const to of outgoing.get(id)) { indegree.set(to, indegree.get(to) - 1); if (indegree.get(to) === 0) queue.push(to); } }
+  if (order.length !== nodes.length) throw new Error("Workflow contains a cycle. Remove a connection before running.");
+  const outputs = new Map(), conditions = new Map(), steps = [], started = Date.now();
+  for (const id of order) {
+    const node = byId.get(id), type = node.type, parents = incoming.get(id);
+    const active = parents.filter(parent => outputs.has(parent) && (() => { const edge = links.find(l => String(l.from) === parent && String(l.to) === id); return !edge?.branch || String(conditions.get(parent)) === edge.branch; })());
+    if (parents.length && !active.length) { steps.push({ nodeId: id, name: safeString(node.title, 120) || type, type, status: "skipped", duration: 0 }); continue; }
+    const inputItems = active.length ? active.map(parent => ({ node: safeString(byId.get(parent).title, 120) || parent, data: outputs.get(parent) })) : [{ node: "workflow input", data: { payload: input } }];
+    const context = inputItems.reduce((all, item) => Object.assign(all, getContext(item.data)), {});
+    const stepStart = Date.now(); let output, status = "completed", detail = "";
+    if (type === "Trigger") { output = { event: "workflow.started", payload: input, context: { event: "workflow.started", payload: input } }; detail = "Trigger accepted the supplied input."; }
+    else if (type === "Agent") {
+      const agent = db.agents.find(a => a.id === node.agentId) || null;
+      output = await executeAgentNode(node, agent, { inputs: inputItems, context });
+      output.context = context; if (agent) { agent.runs = (agent.runs || 0) + 1; agent.updatedAt = new Date().toISOString(); }
+      detail = "Executed through the configured AI provider.";
+    } else if (type === "Condition") {
+      const field = safeString(node.conditionField, 200) || "payload.message", operator = safeString(node.conditionOperator, 40) || "contains", expected = node.conditionValue ?? "Sample";
+      const actual = valueAtPath(context, field), matched = testCondition(actual, operator, expected);
+      conditions.set(id, matched); output = { field, operator, expected, actual: actual ?? null, matched, context };
+      detail = "Condition evaluated " + (matched ? "TRUE" : "FALSE") + ".";
+    } else if (type === "Transform") { output = { transformed: true, items: inputItems.map(x => x.data), context }; detail = "Wrapped incoming items; configure a transform tool for custom mapping."; }
+    else if (type === "Loop") { output = { iterations: 1, items: inputItems.map(x => x.data), context }; detail = "One iteration completed; loop execution is currently a single pass."; }
+    else { status = "blocked"; detail = "Tool node has no connected integration yet. No external action was sent."; output = { status: "not_configured", message: detail, context }; }
+    outputs.set(id, output);
+    steps.push({ nodeId: id, name: safeString(node.title, 120) || type, type, status, detail, duration: Date.now() - stepStart, inputs: inputItems, output });
+    if (status === "blocked") break;
+  }
+  const finished = Date.now(), blocked = steps.some(x => x.status === "blocked"), completed = steps.filter(x => x.status === "completed").length;
+  return { id: randomUUID(), status: blocked ? "blocked" : "completed", steps: completed, duration: finished - started, createdAt: new Date(finished).toISOString(), stepRecords: steps, outputs: Object.fromEntries(outputs), message: blocked ? "Execution stopped at an unconfigured tool node." : "Workflow completed." };
+}
 async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   const pathname = url.pathname;
@@ -99,6 +171,18 @@ async function handle(req, res) {
       const before = db.agents.length; db.agents = db.agents.filter(a => a.id !== agentMatch[1]);
       if (before === db.agents.length) return json(res, 404, { error: "Agent not found." });
       await saveDB(); return json(res, 200, { ok: true });
+    }
+    if (req.method === "POST" && pathname === "/api/workflows/run") {
+      const body = await readBody(req);
+      try {
+        const result = await executeWorkflow(body);
+        db.runs.unshift({ id: result.id, type: "workflow", workflowName: safeString(body.name, 100) || "Untitled workflow", status: result.status, steps: result.steps, duration: result.duration, createdAt: result.createdAt, stepRecords: result.stepRecords });
+        db.runs = db.runs.slice(0, 500);
+        await saveDB();
+        return json(res, result.status === "blocked" ? 207 : 200, result);
+      } catch (error) {
+        return json(res, 400, { error: error.message || "Workflow execution failed." });
+      }
     }
     if (req.method === "GET" && pathname === "/api/workflows") return json(res, 200, { workflows: db.workflows });
     if (req.method === "POST" && pathname === "/api/workflows") {
