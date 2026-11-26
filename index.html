@@ -172,6 +172,23 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
   .chat-compose{padding:6px}
   .chat-compose button{flex:none}
 }
+
+/* Mobile navigation and touch refinements */
+@media(max-width:700px){
+  .app .sidebar{z-index:40;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  .app .sidebar .nav button{min-height:44px;font-size:13px}
+  .app .sidebar .nav{gap:3px}
+  .app .sidebar .brand{min-height:48px}
+  .app.mobile-nav-open:after{z-index:35;cursor:pointer}
+  .topbar{padding-top:env(safe-area-inset-top);height:calc(58px + env(safe-area-inset-top))}
+  .content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+  .canvas-tools{display:flex;flex-wrap:nowrap;overflow-x:auto;max-width:100%;padding:2px 0 9px;scrollbar-width:thin}
+  .canvas-tools .btn{flex:none;white-space:nowrap;min-height:38px}
+  .node{touch-action:none}
+  .tabs{max-width:100%;overflow-x:auto;white-space:nowrap}
+  .tabs button{flex:none}
+  .toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));text-align:center}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
@@ -346,6 +363,7 @@ function openCommandPalette(){const modal=document.getElementById('commandPalett
 function closeCommandPalette(){document.getElementById('commandPalette')?.classList.add('hidden')}
 function renderPaletteResults(query){const out=document.getElementById('paletteResults');if(!out)return;const q=query.trim().toLowerCase();const entries=[...document.querySelectorAll('.nav button[data-page]')].map(b=>({page:b.dataset.page,label:b.querySelector('.nav-text')?.textContent||b.dataset.page,icon:b.querySelector('.ico')?.textContent||'◇'})).filter(x=>!q||x.label.toLowerCase().includes(q)||x.page.includes(q));const agentEntries=agents.filter(a=>!q||a.name.toLowerCase().includes(q)).map(a=>({page:'agents',label:a.name,icon:'✧',hint:'Agent'}));const all=[...entries,...agentEntries].slice(0,12);out.innerHTML=all.length?all.map((x,i)=>'<button class="palette-item'+(i===0?' selected':'')+'" data-palette-page="'+escapeHtml(x.page)+'"><span class="palette-icon">'+escapeHtml(x.icon)+'</span><span>'+escapeHtml(x.label)+'</span><small>'+(x.hint||'Open page')+'</small></button>').join(''):'<div class="empty">No matching pages or agents.</div>'}
 document.getElementById('sidebarToggle').onclick=()=>{const app=document.querySelector('.app');if(window.matchMedia('(max-width:700px)').matches)app.classList.toggle('mobile-nav-open');else app.classList.toggle('sidebar-collapsed')};
+document.querySelector('.app').addEventListener('click',e=>{const app=document.querySelector('.app');if(app.classList.contains('mobile-nav-open')&&!e.target.closest('.sidebar')&&!e.target.closest('#sidebarToggle'))app.classList.remove('mobile-nav-open')});
 document.getElementById('globalSearch').onclick=openCommandPalette;
 document.getElementById('paletteInput').addEventListener('input',e=>renderPaletteResults(e.target.value));
 document.getElementById('paletteResults').addEventListener('click',e=>{const b=e.target.closest('[data-palette-page]');if(!b)return;closeCommandPalette();document.querySelector('.app').classList.remove('mobile-nav-open');history.pushState(null,'','#'+b.dataset.palettePage);render(b.dataset.palettePage)});
