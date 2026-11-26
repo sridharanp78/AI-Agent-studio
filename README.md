@@ -40,3 +40,9 @@ The dashboard, agent builder, node canvas, and playground are frontend foundatio
 
 ## Security note
 This starter does not yet include user authentication, workspace isolation, or production-grade authorization. Run it on your own machine or behind a trusted private network only. Do not expose the API directly to the public internet until authentication, authorization, HTTPS, secret management, and deployment hardening have been added. The server deliberately does not serve `.env`, `server.js`, or the local `data/` directory as static files.
+
+## App access protection
+The app requires `APP_ACCESS_USER` and `APP_ACCESS_PASSWORD` before serving the UI or API. The browser will show a standard sign-in prompt. Set a long, unique password in your deployment provider's secret environment variables. Do not commit real credentials.
+
+## Deploy on Render
+A `render.yaml` Blueprint is included. In Render, create a new Blueprint and select this GitHub repository. Set the secret values for `APP_ACCESS_USER`, `APP_ACCESS_PASSWORD`, and (if you want live AI chat) `OPENAI_API_KEY`. The health endpoint is `/api/health`. The free Render filesystem is ephemeral, so JSON-stored agent/workflow data may reset when the instance restarts; use a persistent disk or managed database for durable production storage.
