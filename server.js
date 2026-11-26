@@ -137,7 +137,7 @@ async function mcpRequest(server, message, sessionId = "") {
   return { payload, sessionId: response.headers.get("mcp-session-id") || sessionId };
 }
 function interpolateMcpValue(value, context) {
-  if (typeof value === "string") return value.replace(/\\{\\{\\s*([\\w.$\\[\\]]+)\\s*\\}\\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
+  if (typeof value === "string") return value.replace(/\{\{\s*([\w.$\[\]]+)\s*\}\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); });
   if (Array.isArray(value)) return value.map(v=>interpolateMcpValue(v,context));
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,interpolateMcpValue(v,context)]));
   return value;
