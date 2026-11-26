@@ -58,7 +58,7 @@ async function staticFile(req, res, pathname) {
     res.end(body);
   } catch { json(res, 404, { error: "Not found" }); }
 }
-function valueAtPath(obj, path) { return String(path || "").replace(/\\[(\\d+)\\]/g, ".$1").split(".").filter(Boolean).reduce((v, key) => v == null ? undefined : v[key], obj); }
+function valueAtPath(obj, path) { return String(path || "").replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean).reduce((v, key) => v == null ? undefined : v[key], obj); }
 function getContext(value) { return value && typeof value === "object" ? (value.context && typeof value.context === "object" ? value.context : value) : {}; }
 function testCondition(actual, operator, expected) {
   if (operator === "exists") return actual !== undefined && actual !== null;
@@ -76,10 +76,10 @@ function testCondition(actual, operator, expected) {
 async function executeAgentNode(node, agent, input) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured on the backend.");
-  const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\\/$/, "");
+  const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
   const model = safeString(node.model, 100) || agent?.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
   const instructions = agent?.instructions || "You are a helpful AI workflow agent. Follow the task and return a useful result.";
-  const task = "Execute this workflow step. Use the input JSON as source data. Return a concise, useful result.\\n\\nNode: " + safeString(node.title, 120) + "\\nDescription: " + safeString(node.detail, 2000) + "\\nInput JSON:\\n" + JSON.stringify(input).slice(0, 20000);
+  const task = "Execute this workflow step. Use the input JSON as source data. Return a concise, useful result.\n\nNode: " + safeString(node.title, 120) + "\nDescription: " + safeString(node.detail, 2000) + "\nInput JSON:\n" + JSON.stringify(input).slice(0, 20000);
   const upstream = await fetch(base + "/chat/completions", { method: "POST", signal: AbortSignal.timeout(45000), headers: { authorization: "Bearer " + apiKey, "content-type": "application/json" }, body: JSON.stringify({ model, temperature: 0.3, messages: [{ role: "system", content: instructions }, { role: "user", content: task }] }) });
   const result = await upstream.json().catch(() => ({}));
   if (!upstream.ok) throw new Error(result.error?.message || "AI provider request failed with status " + upstream.status);
