@@ -74,3 +74,12 @@ Select a Tool call node to configure one of these server-side operations:
 - **Send Slack message** — post a rendered message to a Slack incoming webhook. Set `SLACK_WEBHOOK_URL` as a private backend environment variable; only HTTPS `hooks.slack.com` webhook URLs are accepted.
 
 These tools run inside the Node.js backend. The Slack tool is a real external action and sends a message when configured. Other tools do not send email, access arbitrary URLs, or connect to MCP servers. Store `SLACK_WEBHOOK_URL` only in the backend environment; never place it in workflow JSON or frontend code.
+
+
+## MCP server discovery
+The Integrations and Tools & models pages can discover tools exposed by administrator-configured MCP servers. Configure these backend-only variables:
+- `MCP_SERVERS_JSON` — JSON array, for example `[{"name":"Internal MCP","url":"https://mcp.example.com/mcp","tokenEnv":"INTERNAL_MCP_TOKEN"}]`.
+- `MCP_ALLOWED_HOSTS` — comma-separated exact hostnames allowed to receive MCP requests, for example `mcp.example.com`.
+- `INTERNAL_MCP_TOKEN` — optional bearer token referenced by `tokenEnv`; keep it in the hosting provider's secret settings.
+
+Discovery uses HTTPS only, rejects hostnames not in the explicit allowlist, rejects private/reserved DNS results, blocks redirects, and applies a request timeout. The current MCP feature discovers and displays tool names and schemas only; it does not yet invoke discovered MCP tools from agents or workflows. Do not configure untrusted MCP servers.
