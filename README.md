@@ -25,7 +25,7 @@ No third-party npm packages are required. Agent and workflow records are stored 
 - `PATCH /api/agents/:id` — update an agent.
 - `DELETE /api/agents/:id` — delete an agent.
 - `GET /api/workflows` and `POST /api/workflows` — list/create workflows.
-- `POST /api/workflows/run` — execute a workflow graph on the backend. Trigger, Agent, Condition, Transform and one-pass Loop nodes are supported. Agent nodes call the configured OpenAI-compatible provider. Tool Call nodes stop safely with a `blocked` result until an integration is connected.
+- `POST /api/workflows/run` — execute a workflow graph on the backend. Trigger, Agent, Condition, Transform and one-pass Loop nodes are supported. Agent nodes call the configured OpenAI-compatible provider. Tool Call nodes can execute backend built-ins: `calculator`, `json_lookup`, `text_template`, and `combine`. They do not make external network calls.
 - `POST /api/chat` — send a message to the configured OpenAI-compatible chat completions endpoint.
 
 Example chat body:
@@ -53,7 +53,7 @@ Example request body:
 ```
 
 ## Current scope
-The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat and Agent workflow nodes use the configured OpenAI-compatible provider when the backend is deployed and configured. External tool/MCP execution, team permissions, vector search/RAG, and production deployment hardening are not implemented yet.
+The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat and Agent workflow nodes use the configured OpenAI-compatible provider when the backend is deployed and configured. External integrations and MCP server execution, team permissions, vector search/RAG, and production deployment hardening are not implemented yet. The current built-in workflow tools execute locally on the backend and do not connect to third-party services.
 
 ## Security note
 This starter does not yet include user authentication, workspace isolation, or production-grade authorization. Run it on your own machine or behind a trusted private network only. Do not expose the API directly to the public internet until authentication, authorization, HTTPS, secret management, and deployment hardening have been added. The server deliberately does not serve `.env`, `server.js`, or the local `data/` directory as static files.
@@ -63,3 +63,13 @@ The app requires `APP_ACCESS_USER` and `APP_ACCESS_PASSWORD` before serving the 
 
 ## Deploy on Render
 A `render.yaml` Blueprint is included. In Render, create a new Blueprint and select this GitHub repository. Set the secret values for `APP_ACCESS_USER`, `APP_ACCESS_PASSWORD`, and (if you want live AI chat) `OPENAI_API_KEY`. The health endpoint is `/api/health`. The free Render filesystem is ephemeral, so JSON-stored agent/workflow data may reset when the instance restarts; use a persistent disk or managed database for durable production storage.
+
+
+## Built-in workflow tools
+Select a Tool call node to configure one of these server-side operations:
+- **Calculator** — arithmetic only, for example `(125 * 1.18) + 10`. Arbitrary code is not evaluated.
+- **JSON field lookup** — read a dot/bracket path from workflow context, for example `payload.items[0].status`.
+- **Text template** — interpolate values with placeholders such as `Request status: {{payload.status}}`.
+- **Combine inputs** — return the data received from connected upstream nodes.
+
+These tools run inside the Node.js backend. They do not send email, post to Slack, access arbitrary URLs, or connect to MCP servers. Those integrations require a separate authenticated connector implementation.
