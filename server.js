@@ -3,6 +3,8 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
+import { lookup } from "node:dns/promises";
+import net from "node:net";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, "data");
@@ -86,6 +88,60 @@ async function executeAgentNode(node, agent, input) {
   const reply = result.choices?.[0]?.message?.content;
   if (!reply) throw new Error("AI provider returned an empty response.");
   return { agent: agent?.name || null, model, reply, usage: result.usage || null };
+}
+
+function isPublicAddress(address) {
+  const family = net.isIP(address);
+  if (family === 4) {
+    const p = address.split(".").map(Number);
+    return !(p[0] === 10 || p[0] === 127 || p[0] === 0 || p[0] >= 224 ||
+      (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+      (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127) ||
+      (p[0] === 198 && (p[1] === 18 || p[1] === 19)));
+  }
+  if (family === 6) {
+    const v = address.toLowerCase();
+    return v === "::1" || v === "::" ? false : !(v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe8") || v.startsWith("fe9") || v.startsWith("fea") || v.startsWith("feb") || v.startsWith("::ffff:127.") || v.startsWith("::ffff:10.") || v.startsWith("::ffff:192.168."));
+  }
+  return false;
+}
+function getMcpConfig() {
+  let list = [];
+  try { list = JSON.parse(process.env.MCP_SERVERS_JSON || "[]"); } catch { throw new Error("MCP_SERVERS_JSON must contain valid JSON."); }
+  if (!Array.isArray(list) || list.length > 10) throw new Error("MCP_SERVERS_JSON must be an array of at most 10 servers.");
+  const allowed = new Set((process.env.MCP_ALLOWED_HOSTS || "").split(",").map(x => x.trim().toLowerCase()).filter(Boolean));
+  return list.map((item, index) => {
+    const name = safeString(item?.name, 80) || "MCP server " + (index + 1);
+    let url; try { url = new URL(item?.url); } catch { throw new Error("MCP server URL is invalid for " + name + "."); }
+    if (url.protocol !== "https:" || url.username || url.password || !allowed.has(url.hostname.toLowerCase())) throw new Error("MCP server " + name + " must use HTTPS and a hostname listed in MCP_ALLOWED_HOSTS.");
+    const tokenEnv = /^[A-Z][A-Z0-9_]{2,80}$/.test(item?.tokenEnv || "") ? item.tokenEnv : "";
+    return { name, url: url.toString(), hostname: url.hostname.toLowerCase(), tokenEnv };
+  });
+}
+async function mcpRequest(server, message, sessionId = "") {
+  const addresses = await lookup(server.hostname, { all: true, verbatim: true });
+  if (!addresses.length || addresses.some(a => !isPublicAddress(a.address))) throw new Error("MCP host resolved to a private or reserved address.");
+  const headers = { "content-type": "application/json", accept: "application/json, text/event-stream" };
+  if (server.tokenEnv && process.env[server.tokenEnv]) headers.authorization = "Bearer " + process.env[server.tokenEnv];
+  if (sessionId) headers["mcp-session-id"] = sessionId;
+  const response = await fetch(server.url, { method: "POST", redirect: "error", signal: AbortSignal.timeout(12000), headers, body: JSON.stringify(message) });
+  if (!response.ok) throw new Error("MCP server returned HTTP " + response.status + ".");
+  const contentType = response.headers.get("content-type") || "";
+  const textBody = await response.text();
+  let payload;
+  if (contentType.includes("text/event-stream")) {
+    const data = textBody.split(/\\r?\\n/).filter(line => line.startsWith("data:")).map(line => line.slice(5).trim()).filter(Boolean);
+    payload = data.length ? JSON.parse(data[data.length - 1]) : {};
+  } else payload = textBody ? JSON.parse(textBody) : {};
+  if (payload.error) throw new Error(payload.error.message || "MCP JSON-RPC error.");
+  return { payload, sessionId: response.headers.get("mcp-session-id") || sessionId };
+}
+async function discoverMcpTools(server) {
+  const init = await mcpRequest(server, { jsonrpc:"2.0", id:1, method:"initialize", params:{ protocolVersion:"2025-03-26", capabilities:{}, clientInfo:{ name:"AI Agent Studio", version:"1.0.0" } } });
+  await mcpRequest(server, { jsonrpc:"2.0", method:"notifications/initialized" }, init.sessionId);
+  const listed = await mcpRequest(server, { jsonrpc:"2.0", id:2, method:"tools/list", params:{} }, init.sessionId);
+  const tools = Array.isArray(listed.payload.result?.tools) ? listed.payload.result.tools.slice(0,100).map(t=>({ name:safeString(t.name,100), description:safeString(t.description,500), inputSchema:t.inputSchema && typeof t.inputSchema==="object" ? t.inputSchema : {} })) : [];
+  return { name:server.name, connected:true, tools };
 }
 function safeCalculate(expression) {
   const tokens = String(expression || "").match(/\d+(?:\.\d+)?|[()+*/%-]|\s+/g);
@@ -178,6 +234,15 @@ async function handle(req, res) {
   }
   if (pathname.startsWith("/api/")) {
     if (rateLimited(req)) return json(res, 429, { error: "Too many requests. Please wait a minute and try again." });
+    if (req.method === "GET" && pathname === "/api/mcp/servers") {
+      let configured;
+      try { configured = getMcpConfig(); } catch (error) { return json(res, 400, { error:error.message }); }
+      const results = await Promise.all(configured.map(async server => {
+        try { return await discoverMcpTools(server); }
+        catch (error) { return { name:server.name, connected:false, error:error.message, tools:[] }; }
+      }));
+      return json(res, 200, { servers:results, configured:configured.length });
+    }
     if (req.method === "GET" && pathname === "/api/agents") return json(res, 200, { agents: db.agents });
     if (req.method === "POST" && pathname === "/api/agents") {
       const body = await readBody(req);
