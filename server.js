@@ -113,7 +113,7 @@ function getMcpConfig() {
   return list.map((item, index) => {
     const name = safeString(item?.name, 80) || "MCP server " + (index + 1);
     let url; try { url = new URL(item?.url); } catch { throw new Error("MCP server URL is invalid for " + name + "."); }
-    if (url.protocol !== "https:" || url.username || url.password || !allowed.has(url.hostname.toLowerCase())) throw new Error("MCP server " + name + " must use HTTPS and a hostname listed in MCP_ALLOWED_HOSTS.");
+    if (url.protocol !== "https:" || (url.port && url.port !== "443") || url.username || url.password || !allowed.has(url.hostname.toLowerCase())) throw new Error("MCP server " + name + " must use HTTPS and a hostname listed in MCP_ALLOWED_HOSTS.");
     const tokenEnv = /^[A-Z][A-Z0-9_]{2,80}$/.test(item?.tokenEnv || "") ? item.tokenEnv : "";
     return { name, url: url.toString(), hostname: url.hostname.toLowerCase(), tokenEnv, allowedTools: Array.isArray(item.allowedTools) ? item.allowedTools.filter(x => typeof x === "string").slice(0,50) : [] };
   });
