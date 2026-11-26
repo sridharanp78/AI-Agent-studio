@@ -188,7 +188,7 @@ function safeCalculate(expression) {
   const value=sum(); if (i!==clean.length || !Number.isFinite(value)) throw new Error("Invalid or incomplete calculator expression."); return value;
 }
 async function runBuiltinTool(node, context, inputItems) {
-  const tool = safeString(node.toolName, 40), value = safeString(node.toolInput, 2000);
+  const tool = safeString(node.toolName, 40), value = safeString(node.toolInput, 10000);
   if (tool === "calculator") return { tool, result: safeCalculate(value), context };
   if (tool === "json_lookup") { const result=valueAtPath(context, value); return { tool, path:value, result: result === undefined ? null : result, context }; }
   if (tool === "text_template") { const result=value.replace(/\{\{\s*([\w.$\[\]]+)\s*\}\}/g, (_, path) => { const found=valueAtPath(context,path); return found == null ? "" : typeof found === "object" ? JSON.stringify(found) : String(found); }); return { tool, result, context }; }
