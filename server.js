@@ -77,10 +77,15 @@ function cosineSimilarity(a,b){let dot=0,aa=0,bb=0;for(let i=0;i<Math.min(a.leng
 async function createEmbeddings(texts) {
   if(!process.env.OPENAI_API_KEY)return null;
   const base=(process.env.OPENAI_BASE_URL||"https://api.openai.com/v1").replace(/\/$/,"");
-  const response=await fetch(base+"/embeddings",{method:"POST",signal:AbortSignal.timeout(60000),headers:{authorization:"Bearer "+process.env.OPENAI_API_KEY,"content-type":"application/json"},body:JSON.stringify({model:process.env.OPENAI_EMBEDDING_MODEL||"text-embedding-3-small",input:texts})});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error?.message||"Embedding provider request failed.");
-  return (data.data||[]).sort((a,b)=>a.index-b.index).map(x=>x.embedding);
+  const embeddings=[];
+  for(let start=0;start<texts.length;start+=64){
+    const batch=texts.slice(start,start+64);
+    const response=await fetch(base+"/embeddings",{method:"POST",signal:AbortSignal.timeout(60000),headers:{authorization:"Bearer "+process.env.OPENAI_API_KEY,"content-type":"application/json"},body:JSON.stringify({model:process.env.OPENAI_EMBEDDING_MODEL||"text-embedding-3-small",input:batch})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error?.message||"Embedding provider request failed.");
+    embeddings.push(...(data.data||[]).sort((a,b)=>a.index-b.index).map(x=>x.embedding));
+  }
+  return embeddings;
 }
 async function extractKnowledgeText(name,mimeType,buffer) {
   const ext=path.extname(name).toLowerCase();
