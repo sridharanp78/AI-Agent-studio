@@ -71,5 +71,6 @@ Select a Tool call node to configure one of these server-side operations:
 - **JSON field lookup** — read a dot/bracket path from workflow context, for example `payload.items[0].status`.
 - **Text template** — interpolate values with placeholders such as `Request status: {{payload.status}}`.
 - **Combine inputs** — return the data received from connected upstream nodes.
+- **Send Slack message** — post a rendered message to a Slack incoming webhook. Set `SLACK_WEBHOOK_URL` as a private backend environment variable; only HTTPS `hooks.slack.com` webhook URLs are accepted.
 
-These tools run inside the Node.js backend. They do not send email, post to Slack, access arbitrary URLs, or connect to MCP servers. Those integrations require a separate authenticated connector implementation.
+These tools run inside the Node.js backend. The Slack tool is a real external action and sends a message when configured. Other tools do not send email, access arbitrary URLs, or connect to MCP servers. Store `SLACK_WEBHOOK_URL` only in the backend environment; never place it in workflow JSON or frontend code.
