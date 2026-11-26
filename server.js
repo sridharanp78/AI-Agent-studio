@@ -88,7 +88,7 @@ async function executeAgentNode(node, agent, input) {
   return { agent: agent?.name || null, model, reply, usage: result.usage || null };
 }
 function safeCalculate(expression) {
-  const tokens = String(expression || "").match(/\d+(?:\\.\d+)?|[()+*/%-]|\s+/g);
+  const tokens = String(expression || "").match(/\d+(?:\.\d+)?|[()+*/%-]|\s+/g);
   if (!tokens || tokens.join("").replace(/\s/g, "") !== String(expression || "").replace(/\s/g, "")) throw new Error("Calculator accepts only numbers and + - * / % parentheses.");
   const clean = tokens.filter(t => !/^\s+$/.test(t)); let i = 0;
   function atom() { const t = clean[i++]; if (t === "(") { const v = sum(); if (clean[i++] !== ")") throw new Error("Missing closing parenthesis."); return v; } if (t === "-") return -atom(); if (t === "+") return atom(); const n = Number(t); if (!Number.isFinite(n)) throw new Error("Invalid calculator expression."); return n; }
