@@ -53,7 +53,7 @@ Example request body:
 ```
 
 ## Current scope
-The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat and Agent workflow nodes use the configured OpenAI-compatible provider when the backend is deployed and configured. External integrations and MCP server execution, team permissions, vector search/RAG, and production deployment hardening are not implemented yet. The current built-in workflow tools execute locally on the backend and do not connect to third-party services.
+The dashboard, agent builder, node canvas, and playground are frontend foundations. Live chat and Agent workflow nodes use the configured OpenAI-compatible provider when the backend is deployed and configured. Knowledge uploads support PDF, DOCX, TXT, MD, CSV, JSON, HTML and XML. Documents are chunked and indexed with OpenAI-compatible embeddings when an API key is configured; keyword retrieval is used when embeddings are unavailable. Agent-specific knowledge is retrieved into Playground chat context. The current built-in workflow tools execute locally on the backend and do not connect to third-party services.
 
 ## Security note
 This starter does not yet include user authentication, workspace isolation, or production-grade authorization. Run it on your own machine or behind a trusted private network only. Do not expose the API directly to the public internet until authentication, authorization, HTTPS, secret management, and deployment hardening have been added. The server deliberately does not serve `.env`, `server.js`, or the local `data/` directory as static files.
@@ -95,3 +95,11 @@ Discovery uses HTTPS only, rejects hostnames not in the explicit allowlist, reje
 4. Save the agent and select it in **Playground**. Ask a question that requires the tool.
 
 The model can choose among only the tools assigned to that agent. The backend validates the server allowlist again, re-discovers the selected tool schema, checks arguments, and invokes it. Tool activity appears below the assistant response and in the run records. Tool calls are external side effects; grant only the minimum required tools and use read-only tools first. This feature requires the authenticated Node.js backend and an OpenAI-compatible model that supports function/tool calling. The static frontend preview cannot execute tools.
+
+
+## Knowledge base and retrieval
+- `GET /api/knowledge` lists uploaded document metadata.
+- `POST /api/knowledge` accepts `{ "name": "guide.pdf", "mimeType": "application/pdf", "contentBase64": "..." }` (5 MB per file).
+- `DELETE /api/knowledge/:id` removes a document and detaches it from agents.
+- Agent create/update accepts `knowledgeIds: ["document-id"]`.
+- Chat retrieves up to five relevant chunks from the selected agent's assigned documents. Configure `OPENAI_API_KEY`; embeddings use `text-embedding-3-small` by default and can be changed with `OPENAI_EMBEDDING_MODEL`. If no key is configured, retrieval falls back to keyword matching.
