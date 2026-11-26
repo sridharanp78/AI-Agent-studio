@@ -300,7 +300,7 @@ async function handle(req, res) {
       const body = await readBody(req);
       const name = safeString(body.name, 100);
       if (!name) return json(res, 400, { error: "Agent name is required." });
-      const agent = { id: randomUUID(), name, role: safeString(body.role, 120) || "General", goal: safeString(body.goal, 1000), instructions: safeString(body.instructions, 12000), model: safeString(body.model, 100) || process.env.OPENAI_MODEL || "gpt-4o-mini", provider: safeString(body.provider, 40) || "openai", status: "Draft", runs: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      const agent = { id: randomUUID(), name, role: safeString(body.role, 120) || "General", goal: safeString(body.goal, 1000), instructions: safeString(body.instructions, 12000), model: safeString(body.model, 100) || process.env.OPENAI_MODEL || "gpt-4o-mini", provider: safeString(body.provider, 40) || "openai", mcpTools: Array.isArray(body.mcpTools) ? body.mcpTools.slice(0,20).map(x=>({server:safeString(x.server,80),tool:safeString(x.tool,100)})).filter(x=>x.server&&x.tool) : [], status: "Draft", runs: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       db.agents.unshift(agent); await saveDB();
       return json(res, 201, { agent });
     }
@@ -310,6 +310,7 @@ async function handle(req, res) {
       if (!agent) return json(res, 404, { error: "Agent not found." });
       const body = await readBody(req);
       for (const key of ["name", "role", "goal", "instructions", "model", "provider", "status"]) if (body[key] !== undefined) agent[key] = safeString(body[key], key === "instructions" ? 12000 : 1000);
+      if (body.mcpTools !== undefined) agent.mcpTools = Array.isArray(body.mcpTools) ? body.mcpTools.slice(0,20).map(x=>({server:safeString(x.server,80),tool:safeString(x.tool,100)})).filter(x=>x.server&&x.tool) : [];
       agent.updatedAt = new Date().toISOString(); await saveDB();
       return json(res, 200, { agent });
     }
