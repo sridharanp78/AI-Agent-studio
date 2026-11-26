@@ -62,7 +62,18 @@ async function handle(req, res) {
   const url = new URL(req.url, "http://localhost");
   const pathname = url.pathname;
   if (req.method === "GET" && pathname === "/api/health") {
-    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), provider: process.env.AI_PROVIDER || "openai" });
+    return json(res, 200, { ok: true, service: "AI Agent Studio API", aiConfigured: Boolean(process.env.OPENAI_API_KEY), accessConfigured: Boolean(process.env.APP_ACCESS_USER && process.env.APP_ACCESS_PASSWORD), provider: process.env.AI_PROVIDER || "openai" });
+  }
+  const accessUser = process.env.APP_ACCESS_USER;
+  const accessPassword = process.env.APP_ACCESS_PASSWORD;
+  if (!accessUser || !accessPassword) return json(res, 503, { error: "App access is not configured. Set APP_ACCESS_USER and APP_ACCESS_PASSWORD before opening the app." });
+  const auth = req.headers.authorization || "";
+  let supplied = "";
+  try { if (auth.startsWith("Basic ")) supplied = Buffer.from(auth.slice(6), "base64").toString("utf8"); } catch {}
+  const expected = accessUser + ":" + accessPassword;
+  if (supplied.length !== expected.length || !Buffer.from(supplied).equals(Buffer.from(expected))) {
+    res.writeHead(401, { "www-authenticate": 'Basic realm="AI Agent Studio", charset="UTF-8"', "cache-control": "no-store" });
+    return res.end("Authentication required");
   }
   if (pathname.startsWith("/api/")) {
     if (rateLimited(req)) return json(res, 429, { error: "Too many requests. Please wait a minute and try again." });
