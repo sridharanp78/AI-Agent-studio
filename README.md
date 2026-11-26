@@ -4,6 +4,7 @@ A self-hosted AI agent workspace with a dark dashboard, agent builder, workflow 
 
 ## Requirements
 - Node.js 20 or newer
+- PostgreSQL (optional; recommended for persistent hosted data)
 - An API key from an OpenAI-compatible provider for live chat (optional for browsing the interface)
 
 ## Run locally
@@ -16,7 +17,7 @@ A self-hosted AI agent workspace with a dark dashboard, agent builder, workflow 
    ```
 5. Open http://localhost:3000.
 
-No third-party npm packages are required. Agent and workflow records are stored in `data/db.json`.
+Install dependencies with `npm install`. Without `DATABASE_URL`, agent/workflow records are stored in `data/db.json` (local development only). With `DATABASE_URL`, the app stores agent/workflow/run state and knowledge chunks in PostgreSQL.
 
 ## API
 - `GET /api/health` — service and provider configuration status.
@@ -62,7 +63,7 @@ This starter does not yet include user authentication, workspace isolation, or p
 The app requires `APP_ACCESS_USER` and `APP_ACCESS_PASSWORD` before serving the UI or API. The browser will show a standard sign-in prompt. Set a long, unique password in your deployment provider's secret environment variables. Do not commit real credentials.
 
 ## Deploy on Render
-A `render.yaml` Blueprint is included. In Render, create a new Blueprint and select this GitHub repository. Set the secret values for `APP_ACCESS_USER`, `APP_ACCESS_PASSWORD`, and (if you want live AI chat) `OPENAI_API_KEY`. The health endpoint is `/api/health`. The free Render filesystem is ephemeral, so JSON-stored agent/workflow data may reset when the instance restarts; use a persistent disk or managed database for durable production storage.
+A `render.yaml` Blueprint is included. In Render, create a new Blueprint and select this GitHub repository. Set the secret values for `APP_ACCESS_USER`, `APP_ACCESS_PASSWORD`, and (if you want live AI chat) `OPENAI_API_KEY`. The health endpoint is `/api/health`. The Render Free web-service filesystem is ephemeral. Configure `DATABASE_URL` to a PostgreSQL database to persist app state and knowledge chunks; set `PGSSLMODE=require` only when your provider requires TLS. `PG_POOL_MAX` defaults to 5. Render Free Postgres expires 30 days after creation and is not permanent storage, has no backups, and has a 1 GB limit. Use it only for a short test; use a database with retention/backups for lasting data. Free web services spin down after 15 minutes of inactivity.
 
 
 ## Built-in workflow tools
@@ -103,3 +104,7 @@ The model can choose among only the tools assigned to that agent. The backend va
 - `DELETE /api/knowledge/:id` removes a document and detaches it from agents.
 - Agent create/update accepts `knowledgeIds: ["document-id"]`.
 - Chat retrieves up to five relevant chunks from the selected agent's assigned documents. Configure `OPENAI_API_KEY`; embeddings use `text-embedding-3-small` by default and can be changed with `OPENAI_EMBEDDING_MODEL`. Embedding requests are batched in groups of 64. If no key is configured, retrieval falls back to keyword matching. Embedding API usage may incur provider charges.
+
+
+## PostgreSQL storage
+Set `DATABASE_URL` on the backend service to enable PostgreSQL persistence. On first startup, the app creates `app_state` and `knowledge_documents` tables and migrates existing `data/db.json` state and knowledge chunks if present. Agent, workflow, run and knowledge metadata is stored in PostgreSQL; knowledge chunks and embeddings are stored in a separate table. When `DATABASE_URL` is absent, the app falls back to local JSON files, which are ephemeral on hosted free services. Optional settings: `PGSSLMODE=require` for TLS-required database providers and `PG_POOL_MAX=5` to tune the connection pool.
