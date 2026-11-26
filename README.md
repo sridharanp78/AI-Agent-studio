@@ -83,3 +83,15 @@ The Integrations and Tools & models pages can discover tools exposed by administ
 - `INTERNAL_MCP_TOKEN` — optional bearer token referenced by `tokenEnv`; keep it in the hosting provider's secret settings.
 
 Discovery uses HTTPS only, rejects hostnames not in the explicit allowlist, rejects private/reserved DNS results, blocks redirects, and applies a request timeout. MCP tools can be invoked from a workflow Tool call node by selecting `mcp_tool`, then entering the exact configured server name, discovered tool name, and JSON arguments. Each server must explicitly list permitted tool names in its `allowedTools` array. Argument templates such as `{{payload.query}}` are interpolated from workflow context. The backend re-discovers the tool schema, checks required fields and basic JSON types, then calls the selected tool. This is an external action: only enable trusted servers and tools, and test with non-destructive tools first. MCP tool execution is currently available in workflows; direct agent-playground tool calling is not yet implemented.
+
+
+## Assign MCP tools to an agent
+1. Configure an MCP server in the backend using `MCP_SERVERS_JSON`, `MCP_ALLOWED_HOSTS`, and its private token environment variable.
+2. Add each permitted MCP tool name to that server's `allowedTools` array.
+3. Open **Agents**, edit an agent, and set **Assigned MCP tools (JSON)**. Example:
+   ```json
+   [{"server":"Example MCP","tool":"read_status"}]
+   ```
+4. Save the agent and select it in **Playground**. Ask a question that requires the tool.
+
+The model can choose among only the tools assigned to that agent. The backend validates the server allowlist again, re-discovers the selected tool schema, checks arguments, and invokes it. Tool activity appears below the assistant response and in the run records. Tool calls are external side effects; grant only the minimum required tools and use read-only tools first. This feature requires the authenticated Node.js backend and an OpenAI-compatible model that supports function/tool calling. The static frontend preview cannot execute tools.
