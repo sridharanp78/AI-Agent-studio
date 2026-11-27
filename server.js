@@ -333,7 +333,18 @@ async function executeWorkflow(body) {
   const byId = new Map();
   for (const n of nodes) { const id = safeString(String(n?.id ?? ""), 100); if (!id || byId.has(id)) throw new Error("Workflow nodes must have unique IDs."); const aliases={"Manual Trigger":"Trigger","Webhook":"Trigger","Schedule Trigger":"Trigger","Form Trigger":"Trigger","Chat Trigger":"Trigger","Error Trigger":"Trigger","AI Agent":"Agent","IF":"Condition","Loop Over Items":"Loop","No Operation":"No Operation"};const normalized={...n,type:aliases[n.type]||n.type,originalType:n.type,id};if (!["Trigger","Agent","Condition","Switch","Tool call","Transform","Loop","Edit Fields (Set)","Set","Merge","Filter","Sort","Limit","Aggregate","Split Out","Remove Duplicates","No Operation","Wait","HTTP Request","Google Sheets","Gmail","Slack","Discord","Notion","Airtable","GitHub","Telegram","Postgres","MySQL","Redis","Shopify","Stripe","HubSpot","Salesforce","Microsoft Outlook","Microsoft Teams","Google Calendar","Jira","Trello","Asana","Linear","ClickUp","WhatsApp Business Cloud","Twilio","AWS S3","Elasticsearch","RabbitMQ","Kafka","WordPress","YouTube","X (Twitter)","Facebook Graph API","Instagram","LinkedIn","Calendly","Typeform","Jotform","OpenAI Chat Model","Anthropic Chat Model","Google Gemini Chat Model","Basic LLM Chain","Text Classifier","Information Extractor","Embeddings","Vector Store","MCP Client","Code","Date & Time","Crypto","XML","HTML","Convert to File","Extract from File","Read/Write Files","Respond to Webhook"].includes(normalized.type)) throw new Error("Unsupported workflow node type: "+n.type);byId.set(id,normalized); }
   const incoming = new Map(nodes.map(n => [String(n.id), []])), outgoing = new Map(nodes.map(n => [String(n.id), []]));
-  for (const link of links) { const from = String(link?.from ?? ""), to = String(link?.to ?? ""); if (!byId.has(from) || !byId.has(to) || from === to) throw new Error("A workflow connection references an invalid node."); outgoing.get(from).push(to); incoming.get(to).push(from); }
+  for (const link of links) {
+    const from = String(link?.from ?? ""), to = String(link?.to ?? "");
+    if (!byId.has(from) || !byId.has(to) || from === to) throw new Error("A workflow connection references an invalid node.");
+    const sourceType = byId.get(from).type, branch = safeString(link?.branch, 40);
+    if (branch) {
+      const allowed = sourceType === "Condition" ? ["true", "false"] : sourceType === "Switch" ? ["case-1", "case-2", "default"] : [];
+      if (!allowed.includes(branch)) throw new Error("Invalid " + sourceType + " output branch: " + branch + ".");
+    } else if (sourceType === "Condition" || sourceType === "Switch") {
+      throw new Error(sourceType + " connections must specify an output branch.");
+    }
+    outgoing.get(from).push(to); incoming.get(to).push(from);
+  }
   const indegree = new Map([...byId.keys()].map(id => [id, incoming.get(id).length]));
   const queue = [...byId.keys()].filter(id => indegree.get(id) === 0), order = [];
   while (queue.length) { const id = queue.shift(); order.push(id); for (const to of outgoing.get(id)) { indegree.set(to, indegree.get(to) - 1); if (indegree.get(to) === 0) queue.push(to); } }
