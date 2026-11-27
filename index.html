@@ -1483,6 +1483,37 @@ body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
 .app.blueprint-focus .template-flow-node:hover,.app.blueprint-focus .template-flow-node.is-active{border-color:#e27c50!important;box-shadow:0 0 0 2px #e27c5022,0 8px 22px #6d392016!important}
 @media(max-width:620px){.canvas#canvas,.canvas{height:calc(100vh - 170px)!important;min-height:520px!important}.canvas .node{width:174px!important;min-height:88px!important;padding:10px!important}.app.blueprint-focus .template-flow-scroll{height:58vh!important;min-height:360px!important;padding:20px 8px!important}.app.blueprint-focus .template-flow-track{gap:24px!important;padding:24px 12px!important}.app.blueprint-focus .template-flow-node{flex-basis:180px!important;width:180px!important;min-height:122px!important}.app.blueprint-focus .template-flow-link{width:24px!important;flex-basis:24px!important}}
 
+
+/* n8n canvas fidelity pass: node title bars, app glyphs, ports and wire styling */
+.canvas#canvas{position:relative!important;min-height:720px!important;height:calc(100vh - 245px)!important;max-height:1100px!important;overflow:auto!important;background:#fffdfb!important;background-image:radial-gradient(circle,#d9cbc2 1px,transparent 1.15px)!important;background-size:20px 20px!important;border:1px solid #e8d9d0!important;border-radius:9px!important}
+.canvas#canvas .node{width:184px!important;min-height:86px!important;padding:11px 13px 12px!important;border:1px solid #ded6d1!important;border-radius:7px!important;background:#fff!important;color:#332720!important;box-shadow:0 2px 5px #37251b12,0 5px 12px #37251b0a!important;overflow:visible!important}
+.canvas#canvas .node:hover{transform:translateY(-1px)!important;border-color:#df865d!important;box-shadow:0 0 0 2px #df865d20,0 7px 16px #37251b16!important}
+.canvas#canvas .node.node-selected{border-color:#df7046!important;box-shadow:0 0 0 2px #df70462b,0 7px 18px #37251b18!important}
+.canvas#canvas .node .node-visual-icon{display:grid!important;place-items:center!important;width:31px!important;height:31px!important;float:left!important;margin:0 10px 8px 0!important;border-radius:7px!important;background:color-mix(in srgb,var(--node-brand,#df7046) 12%,white)!important;color:var(--node-brand,#df7046)!important;border:1px solid color-mix(in srgb,var(--node-brand,#df7046) 28%,white)!important;font-size:16px!important;font-weight:750!important}
+.canvas#canvas .node .node-type{display:block!important;min-height:14px!important;margin:0 0 5px!important;padding:1px 0!important;border:0!important;background:transparent!important;color:#8b776c!important;font-size:8px!important;letter-spacing:.65px!important;font-weight:750!important;line-height:1.3!important}
+.canvas#canvas .node .node-type:before{display:none!important}
+.canvas#canvas .node b{display:block!important;clear:none!important;color:#332720!important;font-size:11px!important;line-height:1.35!important;font-weight:700!important}
+.canvas#canvas .node small{display:block!important;clear:both!important;margin-top:8px!important;color:#8b7a70!important;font-size:9px!important;line-height:1.35!important}
+.canvas#canvas .node:before{left:0!important;top:7px!important;bottom:7px!important;width:3px!important;border-radius:0 3px 3px 0!important;background:var(--node-brand,#df7046)!important}
+.canvas#canvas .node[data-behavior="trigger"]{border-radius:18px 7px 7px 18px!important}
+.canvas#canvas .node[data-behavior="logic"]{border-radius:3px 10px 3px 10px!important}
+.canvas#canvas .node[data-behavior="ai"]{border:1px solid #c8a5d8!important;box-shadow:inset 0 0 0 2px #f6eff9,0 3px 10px #37251b10!important}
+.canvas#canvas .node[data-behavior="integration"]{border-radius:7px!important}
+.canvas#canvas .node[data-behavior="data"]{border-radius:7px 7px 3px 3px!important}
+.canvas#canvas .node .node-input-port,.canvas#canvas .node .node-output-port{width:11px!important;height:11px!important;border:2px solid #c87951!important;border-radius:50%!important;background:#fff!important;box-shadow:0 0 0 2px #fff!important;z-index:5!important}
+.canvas#canvas .node .node-input-port{left:-7px!important}
+.canvas#canvas .node .node-output-port{right:-7px!important}
+.canvas#canvas .node .node-output-port:not(:empty){width:20px!important;height:20px!important;border-radius:10px!important;background:#fff7f1!important;color:#a65330!important;font-size:8px!important;font-weight:800!important}
+.canvas#canvas .workflow-links{z-index:2!important;overflow:visible!important}
+.canvas#canvas .workflow-links path{fill:none!important;stroke:#ce7955!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important;filter:none!important;opacity:1!important;pointer-events:stroke!important}
+.canvas#canvas .workflow-links path:hover{stroke:#e34b35!important;stroke-width:3.5!important}
+.canvas#canvas .workflow-links path[marker-end*="true"]{stroke:#55a77b!important}
+.canvas#canvas .workflow-links path[marker-end*="false"]{stroke:#e28b50!important}
+.canvas#canvas .workflow-group-frame{border:1px dashed #e1a17e!important;background:#fff5ee88!important;border-radius:10px!important}
+.canvas#canvas .node.connection-source{border-color:#e34b35!important;box-shadow:0 0 0 3px #e34b3524!important}
+.canvas#canvas .node.connection-target-candidate .node-input-port{background:#f4a261!important;box-shadow:0 0 0 5px #f4a26130!important}
+@media(max-width:700px){.canvas#canvas{height:calc(100dvh - 190px)!important;min-height:540px!important}.canvas#canvas .node{width:166px!important;min-height:82px!important;padding:9px!important}.canvas#canvas .node .node-visual-icon{width:27px!important;height:27px!important}}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
