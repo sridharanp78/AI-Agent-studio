@@ -1290,6 +1290,164 @@ body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
  .app.blueprint-focus .template-flow-node b{font-size:13px!important}
  .app.blueprint-focus .template-detail-side{grid-template-columns:1fr!important}
 }
+
+/* n8n-inspired node and edge system — retain the studio's daylight palette */
+.canvas#canvas,.canvas{
+ background-color:#fffaf6!important;
+ background-image:radial-gradient(circle,#dfcfc5 1px,transparent 1.1px)!important;
+ background-size:20px 20px!important;
+ border:1px solid #ead9cf!important;border-radius:8px!important;
+ box-shadow:none!important;isolation:isolate!important;
+}
+.canvas:after{content:""!important;display:none!important}
+.canvas .node{
+ width:142px!important;min-height:126px!important;height:auto!important;
+ padding:12px 8px 10px!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:flex-start!important;gap:0!important;
+ border:1px solid #dfd2ca!important;border-radius:8px!important;
+ background:#fff!important;color:#40332d!important;
+ box-shadow:0 2px 6px rgba(72,48,35,.10)!important;
+ overflow:visible!important;text-align:center!important;
+}
+.canvas .node:before{display:none!important}
+.canvas .node:after{display:none!important}
+.canvas .node .node-visual-icon{
+ order:0!important;display:grid!important;place-items:center!important;
+ width:54px!important;height:54px!important;min-width:54px!important;
+ margin:2px auto 9px!important;border-radius:9px!important;
+ background:color-mix(in srgb,var(--node-brand,#df7048) 10%,white)!important;
+ color:var(--node-brand,#df7048)!important;
+ border:1px solid color-mix(in srgb,var(--node-brand,#df7048) 28%,white)!important;
+ font-size:27px!important;font-weight:750!important;line-height:1!important;
+ box-shadow:none!important;
+}
+.canvas .node[data-behavior="trigger"] .node-visual-icon{border-radius:50%!important}
+.canvas .node[data-behavior="logic"] .node-visual-icon{border-radius:8px!important;background:#fff4df!important;color:#b77b25!important;border-color:#efd8ad!important}
+.canvas .node[data-behavior="ai"] .node-visual-icon{border-radius:50%!important;background:#f4ecf8!important;color:#9467ad!important;border-color:#dfcce8!important}
+.canvas .node[data-behavior="integration"] .node-visual-icon{border-radius:8px!important}
+.canvas .node[data-behavior="transform"] .node-visual-icon{border-radius:8px!important;background:#fff0e7!important}
+.canvas .node .node-type{
+ order:1!important;display:none!important;
+}
+.canvas .node b{
+ order:2!important;display:block!important;width:100%!important;
+ margin:0!important;color:#44352e!important;font-size:11px!important;
+ line-height:1.35!important;font-weight:650!important;text-align:center!important;
+}
+.canvas .node small{
+ order:3!important;display:block!important;width:100%!important;
+ margin:5px 0 0!important;color:#947f73!important;font-size:9px!important;
+ line-height:1.35!important;text-align:center!important;
+}
+.canvas .node .node-input-port,.canvas .node .node-output-port{
+ width:10px!important;height:10px!important;min-width:10px!important;min-height:10px!important;
+ top:calc(50% - 5px)!important;padding:0!important;
+ border:1.5px solid #fff!important;border-radius:50%!important;
+ background:#d5c8bf!important;box-shadow:0 0 0 1px #bda99d!important;
+ color:#fff!important;font-size:7px!important;z-index:10!important;
+}
+.canvas .node .node-input-port{left:-6px!important}
+.canvas .node .node-output-port{right:-6px!important}
+.canvas .node .node-output-port[data-branch="true"]{background:#69a987!important;box-shadow:0 0 0 1px #69a987!important}
+.canvas .node .node-output-port[data-branch="false"]{background:#d77b52!important;box-shadow:0 0 0 1px #d77b52!important}
+.canvas .node .node-output-port[data-branch^="case-"]{background:#729ac0!important;box-shadow:0 0 0 1px #729ac0!important}
+.canvas .node .node-output-port[data-branch="default"]{background:#d5a34f!important;box-shadow:0 0 0 1px #d5a34f!important}
+.canvas .node:hover,.canvas .node.node-selected{
+ transform:translateY(-1px)!important;border-color:#df8a65!important;
+ box-shadow:0 0 0 2px #f4dfd4,0 5px 12px rgba(72,48,35,.12)!important;
+}
+.canvas .node.node-dragging{cursor:grabbing!important;z-index:12!important}
+.canvas .node[data-run-state="completed"]{border-color:#69a987!important}
+.canvas .node[data-run-state="failed"]{border-color:#d94d3e!important}
+.canvas .node[data-run-state="running"]{border-color:#e7a04c!important}
+.canvas .workflow-links{z-index:1!important;overflow:visible!important}
+.canvas .workflow-links path{
+ fill:none!important;stroke:#b8aaa1!important;stroke-width:2!important;
+ stroke-dasharray:none!important;filter:none!important;animation:none!important;
+}
+.canvas .workflow-links path[marker-end*="workflowArrow-true"]{stroke:#69a987!important}
+.canvas .workflow-links path[marker-end*="workflowArrow-false"]{stroke:#d77b52!important}
+.canvas .workflow-links text{
+ fill:#8e7a70!important;stroke:#fffaf6!important;stroke-width:4px!important;
+ paint-order:stroke!important;font-size:10px!important;font-weight:650!important;
+}
+.canvas .node-hover-details{
+ background:#fff!important;color:#49372e!important;border:1px solid #e9d4c8!important;
+ border-radius:8px!important;box-shadow:0 8px 24px rgba(72,48,35,.16)!important;
+}
+.canvas .node-run-badge{background:#fff4ed!important;color:#a95535!important}
+.canvas .node[data-run-state="completed"] .node-run-badge{background:#edf7f0!important;color:#397b58!important}
+.canvas .node[data-run-state="failed"] .node-run-badge{background:#fff0ed!important;color:#bd493d!important}
+.canvas .node[data-run-state="skipped"]{opacity:.65!important}
+.canvas .node .node-visual-icon{flex-shrink:0!important}
+
+/* Agent and industry blueprint diagrams use the same n8n node grammar */
+.template-flow-scroll{overflow:auto!important;padding:30px 22px 36px!important;background-color:#fffaf6!important;background-image:radial-gradient(circle,#dfcfc5 1px,transparent 1.1px)!important;background-size:20px 20px!important;border:1px solid #ead9cf!important;border-radius:8px!important}
+.template-flow-track{
+ display:flex!important;align-items:center!important;justify-content:flex-start!important;
+ gap:34px!important;width:max-content!important;min-width:100%!important;padding:24px 20px!important;
+}
+.template-flow-node{
+ flex:0 0 142px!important;width:142px!important;min-height:150px!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:flex-start!important;gap:0!important;padding:9px 7px!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;color:#44352e!important;text-align:center!important;
+}
+.template-flow-node-icon{
+ width:76px!important;height:76px!important;display:grid!important;place-items:center!important;
+ margin:0 auto 10px!important;border:1px solid #dfd2ca!important;border-radius:9px!important;
+ background:#fff!important;color:#c45c35!important;font-size:31px!important;font-weight:750!important;
+ box-shadow:0 2px 6px rgba(72,48,35,.10)!important;
+}
+.template-flow-node.trigger .template-flow-node-icon{border-radius:50%!important;background:#fff!important;color:#df7048!important}
+.template-flow-node.logic .template-flow-node-icon{background:#fff4df!important;color:#b77b25!important;border-color:#efd8ad!important}
+.template-flow-node.ai .template-flow-node-icon{border-radius:50%!important;background:#f4ecf8!important;color:#9467ad!important;border-color:#dfcce8!important}
+.template-flow-node.app .template-flow-node-icon{background:#fff!important;color:#5b91b0!important}
+.template-flow-node.data .template-flow-node-icon{background:#edf6ef!important;color:#649a78!important}
+.template-flow-node-kind{display:block!important;margin:0 0 4px!important;color:#9a7767!important;font-size:9px!important;letter-spacing:.35px!important;text-transform:none!important}
+.template-flow-node b{display:block!important;margin:0!important;color:#45352c!important;font-size:11px!important;line-height:1.35!important;font-weight:650!important}
+.template-flow-node small{display:none!important}
+.template-flow-node:before,.template-flow-node:after{display:none!important}
+.template-flow-node:hover,.template-flow-node.is-active{
+ transform:translateY(-2px)!important;border:0!important;background:transparent!important;
+ box-shadow:none!important;
+}
+.template-flow-node:hover .template-flow-node-icon,.template-flow-node.is-active .template-flow-node-icon{
+ border-color:#df8a65!important;box-shadow:0 0 0 3px #f5e2d8,0 5px 12px rgba(72,48,35,.12)!important;
+}
+.template-flow-link{
+ position:relative!important;flex:0 0 34px!important;width:34px!important;height:2px!important;
+ margin:0!important;background:#b8aaa1!important;border:0!important;
+}
+.template-flow-link:after{
+ content:""!important;position:absolute!important;right:-1px!important;top:-4px!important;
+ width:0!important;height:0!important;border-top:5px solid transparent!important;
+ border-bottom:5px solid transparent!important;border-left:6px solid #b8aaa1!important;
+}
+.template-flow-link:before{display:none!important}
+.agent-detail-flow .agent-detail-step{
+ flex:0 0 142px!important;width:142px!important;min-height:150px!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;padding:9px 7px!important;
+}
+.agent-detail-flow .agent-detail-step-icon{
+ width:76px!important;height:76px!important;margin:0 auto 10px!important;
+ border:1px solid #dfd2ca!important;border-radius:9px!important;
+ background:#fff!important;color:#c45c35!important;font-size:31px!important;
+ box-shadow:0 2px 6px rgba(72,48,35,.10)!important;
+}
+.agent-detail-flow .agent-detail-step b{font-size:11px!important;color:#45352c!important}
+.agent-detail-flow .agent-detail-step small{font-size:9px!important;color:#947f73!important}
+.agent-detail-flow .agent-detail-step:hover{background:transparent!important;box-shadow:none!important}
+@media(max-width:700px){
+ .canvas .node{width:126px!important;min-height:116px!important;padding:9px 6px!important}
+ .canvas .node .node-visual-icon{width:46px!important;height:46px!important;font-size:23px!important}
+ .template-flow-track{gap:22px!important;padding:18px 10px!important}
+ .template-flow-node{flex-basis:126px!important;width:126px!important}
+ .template-flow-node-icon,.agent-detail-flow .agent-detail-step-icon{width:66px!important;height:66px!important}
+ .template-flow-link{flex-basis:22px!important;width:22px!important}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
