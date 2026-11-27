@@ -1901,7 +1901,7 @@ function storeN8nNodePosition(item,raw,support){
  const aiX=180+agentIndex*220;
  const supporting=raw.filter(x=>support.some(k=>x.type.includes(k)));
  const index=Math.max(0,supporting.indexOf(item));
- return [aiX-150+(index%3)*150,430+Math.floor(index/3)*160];
+ return [aiX-240+(index%3)*240,440+Math.floor(index/3)*190];
 }
 function storeN8nNodeVersion(type){
  const key=String(type||'').split('.').pop();
