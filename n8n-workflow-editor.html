@@ -129,14 +129,22 @@ h5{margin:18px 0 0;font-size:12px;color:var(--mute);font-weight:600}
 .auth-card h1{font-size:25px;margin:0 0 6px}.auth-card p{color:var(--mute);margin:0 0 18px}.auth-card label{margin-top:13px}.auth-card .btn{width:100%;margin-top:18px;padding:10px}.auth-switch{text-align:center;margin-top:14px;font-size:13px;color:var(--mute)}.auth-switch button{border:0;background:none;color:var(--pri);font-weight:700}.auth-note{font-size:11px!important;line-height:1.5;margin-top:16px!important}.auth-error{color:var(--bad);font-size:12px;min-height:18px;margin-top:8px}
 .auth-out{font-size:12px}
 
-/* Workflow canvas refinements: keep card dimensions aligned with connector geometry. */
-.nw{width:220px;height:155px}
-.n{border-width:1.5px;border-radius:9px;background:#fff;box-shadow:0 1px 2px rgba(25,32,48,.06);padding:15px}
-.n.trg{border-radius:13px}
-.n svg{width:32px;height:32px}
-.n-icon{width:32px;height:32px;font-size:17px;margin-bottom:10px}
-.node-title{font-size:12px;line-height:1.4;margin:6px 0}
-.node-sub{font-size:10px;line-height:1.3;max-height:26px}
+/* Compact workflow cards: horizontal n8n-style identity with matching port geometry. */
+.nw{width:200px;height:100px}
+.n{position:relative;border:1px solid #dfe3e9;border-top:3px solid var(--node-accent,var(--pri));border-radius:8px;background:#fff;box-shadow:0 2px 5px rgba(24,32,48,.07);padding:12px 10px 10px 54px;display:block;text-align:left;overflow:visible}
+.n.trg{border-radius:8px}
+.n svg{width:28px;height:28px}
+.n-icon{position:absolute;left:13px;top:17px;width:29px;height:29px;margin:0;border-radius:7px;background:#fff4ed;color:#bd5735;font-size:16px}
+.node-kind{position:absolute;left:54px;top:12px;font-size:8px;line-height:1;color:#8b93a3;letter-spacing:.45px}
+.node-title{position:absolute;left:54px;top:27px;width:calc(100% - 65px);font-size:12px;line-height:1.25;margin:0;max-height:32px;overflow:hidden}
+.node-sub{position:absolute;left:54px;top:63px;width:calc(100% - 65px);font-size:9px;line-height:1.25;max-height:22px}
+.nw:hover .n,.nw.sel .n{box-shadow:0 0 0 2px rgba(255,109,90,.13);border-color:#ff6d5a}
+.pin:after{width:9px;height:9px;background:#fff;border:2px solid #9298a5}
+.pin:hover:after,.pin.on:after{border-color:var(--pri);background:var(--pri)}
+svg.w path.e{stroke:#9298a5;stroke-width:2}
+svg.w path.e.run{stroke:#2cb67d;stroke-width:2.5}
+svg.w path.e.sel{stroke:#ff6d5a;stroke-width:3}
+svg.w path.hit{stroke-width:16}
 .pin:after{width:10px;height:10px;background:#fff;border:2px solid #9298a5}
 .pin:hover:after,.pin.on:after{border-color:var(--pri);background:var(--pri)}
 svg.w path.e{stroke:#9298a5;stroke-width:2.2}
@@ -455,7 +463,7 @@ function aiPorts(n){
 }
 function aiPortPoint(n,type,index,dir){
  var p=aiPorts(n),list=dir==="in"?p.inputs:p.outputs,idx=list.indexOf(type),count=list.length;
- return [n.position[0]+OX+220*(idx+1)/(count+1),n.position[1]+OY+155]
+ return [n.position[0]+OX+200*(idx+1)/(count+1),n.position[1]+OY+100]
 }
 function drawAiPorts(n,x,y){
  var p=aiPorts(n);
@@ -570,7 +578,7 @@ function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+M
 var DB={list:[]},CUR=null;
 function loadDB(){var o=null,f=null;try{var t=localStorage.getItem("n8n-cold-mail-v5");if(t){o=JSON.parse(t);if(o&&Array.isArray(o.list))return o}}catch(e){}try{var t4=localStorage.getItem(KEY);if(t4){var q=JSON.parse(t4);if(q&&q.nodes)f=q}}catch(e){}return{list:[{id:uid(),wf:f||clone(SEED),updated:Date.now()}]}}
 function uniq(b){if(!nb(b))return b;var k=1;while(nb(b+k))k++;return b+k}
-function pt(n,i,t,out){return[n.position[0]+OX+(out?220:0),n.position[1]+OY+155*(i+1)/(t+1)]}
+function pt(n,i,t,out){return[n.position[0]+OX+(out?200:0),n.position[1]+OY+100*(i+1)/(t+1)]}
 function tidy(a){var c=S.connections[a];if(!c)return;var m=c.main||[];while(m.length&&!(m[m.length-1]||[]).length)m.pop();if(!m.length)delete S.connections[a]}
 function parentsOf(name){var r=[];eachEdge(function(a,o,k,t){if(t.node===name)r.push({a:a,o:o,i:t.index||0})});return r}
 function sub(n){var p=n.parameters||{},k=skey(n);if(APP[k]&&k!=="postgres"&&k!=="mySql"&&k!=="mongoDb"&&k!=="redis"){var a=APP[k],r=p.resource||a.ord[0],o=p.operation||(a.r[r]||[])[0];return o+": "+r}if(APP[k])return(p.operation||APP[k].r[""][0]);return""}
@@ -614,7 +622,7 @@ function edgeD(o,i){
 function mid(o,i){return back(o,i)?[(o[0]+i[0])/2,Math.max(o[1],i[1])+140]:[(o[0]+i[0])/2,(o[1]+i[1])/2]}
 function nstate(name){var r=RES[name];if(!r||!vis[name]||r.skip)return"";return r.err?"err":"ran"}
 function draw(){$("empty").hidden=S.nodes.length>0;
- var mx=900,my=420;S.nodes.forEach(function(n){mx=Math.max(mx,n.position[0]+OX+460);my=Math.max(my,n.position[1]+OY+360)});
+ var mx=900,my=420;S.nodes.forEach(function(n){mx=Math.max(mx,n.position[0]+OX+440);my=Math.max(my,n.position[1]+OY+300)});
  var zs=$("zs");zs.style.width=mx*Z+"px";zs.style.height=my*Z+"px";st.style.width=mx+"px";st.style.height=my+"px";st.style.transform="scale("+Z+")";W.setAttribute("width",mx);W.setAttribute("height",my);
  Array.prototype.slice.call(st.children).forEach(function(c){if(c!==W)st.removeChild(c)});
  Array.prototype.slice.call(W.querySelectorAll("path.e,path.hit,path.tmp")).forEach(function(p){W.removeChild(p)});
@@ -680,7 +688,7 @@ function fit(){
  var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
  S.nodes.forEach(function(n){minX=Math.min(minX,n.position[0]);maxX=Math.max(maxX,n.position[0]);minY=Math.min(minY,n.position[1]);maxY=Math.max(maxY,n.position[1])});
  if(!S.nodes.length){minX=0;maxX=0;minY=0;maxY=0}
- var cv=$("cv"),pad=64,graphW=Math.max(220,maxX-minX+220),graphH=Math.max(155,maxY-minY+155);
+ var cv=$("cv"),pad=64,graphW=Math.max(200,maxX-minX+200),graphH=Math.max(100,maxY-minY+100);
  var scaleW=Math.max(0.25,(cv.clientWidth-pad*2)/graphW),scaleH=Math.max(0.25,(cv.clientHeight-pad*2)/graphH);
  Z=Math.min(1,scaleW,scaleH);draw();
  cv.scrollLeft=Math.max(0,(minX+OX)*Z-pad);
@@ -958,7 +966,7 @@ $("home").addEventListener("click",function(e){
  var c=t.closest&&t.closest(".wc");if(!c)return;var id=c.dataset.id,en=DB.list.filter(function(x){return x.id===id})[0];if(!en)return;
  if(t.dataset.del)delWf(id);else if(t.dataset.dup)dupWf(id);else openWf(id)});
 $("home").addEventListener("input",function(e){if(e.target.id==="hs")renderHome()});
-function openWf(id){CUR=DB.list.filter(function(x){return x.id===id})[0];if(!CUR)return;S=CUR.wf;sel=null;pend=null;RES={};vis={};closeNDV();closeNC();$("wn").value=S.name;show("ed");fit()}
+function openWf(id){CUR=DB.list.filter(function(x){return x.id===id})[0];if(!CUR)return;S=CUR.wf;sel=null;pend=null;RES={};vis={};closeNDV();closeNC();$("wn").value=S.name;show("ed");var overlap=false;for(var i=0;i<S.nodes.length&&!overlap;i++)for(var j=i+1;j<S.nodes.length;j++){var a=S.nodes[i].position,b=S.nodes[j].position;if(Math.abs(a[0]-b[0])<224&&Math.abs(a[1]-b[1])<124){overlap=true;break}}if(overlap)tidyLayout();else fit()}
 function goHome(){if(CUR)save();closeNDV();closeNC();$("md").hidden=true;$("menu").hidden=true;show("home");renderHome()}
 function createWf(){var e={id:uid(),wf:{name:wfName("My workflow"),nodes:[],connections:{}},updated:Date.now()};DB.list.unshift(e);CUR=e;save();openWf(e.id)}
 function dupWf(id){var o=DB.list.filter(function(x){return x.id===id})[0];if(!o)return;var w=clone(o.wf);w.name=wfName(o.wf.name+" copy");w.nodes.forEach(function(n){n.id=uid()});DB.list.unshift({id:uid(),wf:w,updated:Date.now()});save();if($("home").hidden)goHome();else renderHome()}
@@ -994,7 +1002,7 @@ function tidyLayout(){
  Object.keys(cols).forEach(function(level){
   var col=cols[level].sort(function(a,b){return a.position[1]-b.position[1]});
   col.forEach(function(n,i){
-   n.position=[+level*240,Math.round(((i-(col.length-1)/2)*184)/8)*8]
+   n.position=[+level*260,Math.round(((i-(col.length-1)/2)*140)/8)*8]
   });
  });
  save();fit();
