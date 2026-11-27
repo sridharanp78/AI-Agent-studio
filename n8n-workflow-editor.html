@@ -145,6 +145,12 @@ svg.w path.hit{stroke-width:18}
 .cap span{display:block;margin-top:3px;font-size:11px;color:#858b99}
 .nw:hover .n,.nw.sel .n{box-shadow:0 0 0 2px rgba(255,109,90,.12);border-color:#ff6d5a}
 
+.aipin{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;border:2px solid #10a37f;z-index:4;cursor:crosshair;touch-action:none}
+.aipin:hover{transform:scale(1.18);box-shadow:0 0 0 3px rgba(16,163,127,.12)}
+.aipin-out{border-color:#10a37f}.aipin-in{border-color:#d97706}
+.aiplab{position:absolute;transform:translateX(-50%);font-size:10px;color:#697386;white-space:nowrap;pointer-events:none;background:var(--bg);padding:0 3px;z-index:1}
+.aiplab-in{color:#b7791f}.aiplab-out{color:#07845f}
+svg.w path.ai-edge{stroke-width:2.2;stroke-dasharray:5 3;fill:none}
 </style>
 </head>
 <body>
@@ -391,6 +397,51 @@ function dv(n,f){var v=getPath(n.parameters||{},f.k);if(v===undefined)v=typeof f
 /* graph helpers */
 function nb(name){return S.nodes.filter(function(n){return n.name===name})[0]}
 function eachEdge(f){Object.keys(S.connections).forEach(function(a){(S.connections[a].main||[]).forEach(function(arr,oi){(arr||[]).forEach(function(t,k){f(a,oi,k,t)})})})}
+function eachTypedEdge(f){Object.keys(S.connections).forEach(function(a){var c=S.connections[a]||{};Object.keys(c).forEach(function(type){(c[type]||[]).forEach(function(arr,oi){(arr||[]).forEach(function(t,k){if(type!=="main")f(a,type,oi,k,t)})})})})}
+function aiPorts(n){
+ var t=n.type||"",k=t.split(".").pop(),I=[],O=[];
+ if(k==="agent")I=["ai_languageModel","ai_tool","ai_memory","ai_outputParser"];
+ if(k==="lmChatOpenAi"||k==="lmChatAnthropic"||k==="lmChatGoogleGemini"||k==="lmChatOllama"||k==="lmChatAzureOpenAi"||k==="lmChatGroq")O=["ai_languageModel"];
+ if(k==="toolCalculator"||k==="toolHttpRequest"||k==="toolCode"||k==="toolWorkflow"||k==="toolSerpApi"||k==="toolWikipedia"||k==="toolVectorStore")O=["ai_tool"];
+ if(k.indexOf("memory")===0)O=["ai_memory"];
+ if(k.indexOf("embeddings")===0)O=["ai_embedding"];
+ if(k.indexOf("vectorStore")===0){I=["ai_embedding"];O=["ai_vectorStore"]}
+ if(k.indexOf("retriever")===0){I=["ai_vectorStore"];O=["ai_retriever"]}
+ if(k.indexOf("document")===0)O=["ai_document"];
+ if(k.indexOf("textSplitter")===0)O=["ai_textSplitter"];
+ if(k.indexOf("outputParser")===0)O=["ai_outputParser"];
+ return{inputs:I,outputs:O}
+}
+function aiPortPoint(n,type,index,dir){
+ var p=aiPorts(n),list=dir==="in"?p.inputs:p.outputs,idx=list.indexOf(type),count=list.length;
+ return [n.position[0]+OX+100*(idx+1)/(count+1),n.position[1]+OY+(dir==="in"?100:0)]
+}
+function drawAiPorts(n,x,y){
+ var p=aiPorts(n);
+ p.inputs.forEach(function(type,i){
+  var q=aiPortPoint(n,type,0,"in"),d=el("aipin aipin-in","",q[0],q[1]);d.title=type;d.setAttribute("aria-label",type+" input");
+  el("aiplab aiplab-in",type.replace("ai_",""),q[0],q[1]+15);
+  d.onpointerdown=function(e){e.stopPropagation();if(pend&&pend.type===type){connectTyped(pend.n,type,pend.o,n.name,0);pend=null;hint()}else if(pend){pend=null;hint()}}
+ });
+ p.outputs.forEach(function(type,i){
+  var q=aiPortPoint(n,type,0,"out"),d=el("aipin aipin-out","",q[0],q[1]);d.title=type;d.setAttribute("aria-label",type+" output");
+  el("aiplab aiplab-out",type.replace("ai_",""),q[0],q[1]-17);
+  d.onpointerdown=function(e){e.stopPropagation();e.preventDefault();pend={n:n.name,o:0,type:type};drag=null;hint();draw()}
+ })
+}
+function connectTyped(a,type,oi,b,ii){
+ if(a===b||!nb(b))return;
+ var c=S.connections[a]=S.connections[a]||{};c[type]=c[type]||[];
+ while(c[type].length<=oi)c[type].push([]);
+ if(!c[type][oi].some(function(t){return t.node===b&&t.index===ii}))c[type][oi].push({node:b,type:type,index:ii});
+ save();draw()
+}
+function delTypedEdge(a,type,oi,k){
+ var c=S.connections[a];if(!c||!c[type]||!c[type][oi])return;
+ c[type][oi].splice(k,1);while(c[type].length&&!(c[type][c[type].length-1]||[]).length)c[type].pop();
+ if(!c[type].length)delete c[type];if(!Object.keys(c).length)delete S.connections[a];
+ sel=null;save();draw()
+}
 function descOf(name){var seen={},st=[name];while(st.length){var a=st.pop();((S.connections[a]||{main:[]}).main||[]).forEach(function(arr){(arr||[]).forEach(function(t){if(!seen[t.node]){seen[t.node]=1;st.push(t.node)}})})}return seen}
 /* ENGINE */
 var RES={},ORDER=[],SAMPLE={leads:[{Name:"Asha",Email:"asha@example.com","Sent Status":"",Time:"",row_number:2},{Name:"Ravi",Email:"ravi@example.com","Sent Status":"SENT",Time:"09:12:44",row_number:3},{Name:"",Email:"meera@example.com","Sent Status":"",Time:"",row_number:4}],tpl:[{Subject:"Quick question about your work",Body:"Hi [name],\nI came across your profile and had a quick idea to share.\nWorth a short chat?"},{Subject:"Idea for your team",Body:"Hi [name],\nWe help teams save time on outreach.\nOpen to a quick look?"}]};
@@ -489,7 +540,7 @@ function connect(a,oi,b,ii){
 function delEdge(a,oi,k){S.connections[a].main[oi].splice(k,1);tidy(a);sel=null;save();draw()}
 function delNode(name){
  S.nodes=S.nodes.filter(function(n){return n.name!==name});delete S.connections[name];if(S.pinData)delete S.pinData[name];
- Object.keys(S.connections).forEach(function(a){S.connections[a].main=S.connections[a].main.map(function(arr){return(arr||[]).filter(function(t){return t.node!==name})});tidy(a)});
+ Object.keys(S.connections).forEach(function(a){var c=S.connections[a];Object.keys(c).forEach(function(type){c[type]=c[type].map(function(arr){return(arr||[]).filter(function(t){return t.node!==name})});if(type==="main")tidy(a);else{while(c[type].length&&!(c[type][c[type].length-1]||[]).length)c[type].pop();if(!c[type].length)delete c[type]}});if(!Object.keys(c).length)delete S.connections[a]});
  delete RES[name];sel=null;if(ndvName===name)closeNDV();save();draw()}
 function rename(o,nn){
  nn=nn.trim();if(!nn||nn===o)return"";if(nb(nn))return"exists";
@@ -546,6 +597,7 @@ function draw(){$("empty").hidden=S.nodes.length>0;
    (function(j){o.onpointerdown=function(e){e.stopPropagation();e.preventDefault();pend={n:n.name,o:j};drag=null;hint();draw()}})(j);
    if(!conn[n.name+"|"+j]){var s=mk("path");s.setAttribute("class","e");s.setAttribute("d","M"+(q[0]+5)+","+q[1]+" L"+(q[0]+32)+","+q[1]);W.appendChild(s);
     var pb=el("pb","+",q[0]+32,q[1]);pb.setAttribute("role","button");pb.setAttribute("aria-label","Add node after "+n.name);(function(j){pb.onpointerdown=function(e){e.stopPropagation();addFrom={n:n.name,o:j};openNC()}})(j)}}
+  drawAiPorts(n,x,y);
  });
  eachEdge(function(a,oi,k,t){
   var A=nb(a),B=nb(t.node);if(!A||!B)return;var fa=info(A),fb=info(B),ii=Math.min(t.index||0,Math.max(fb.ins-1,0));
@@ -556,13 +608,23 @@ function draw(){$("empty").hidden=S.nodes.length>0;
   if(cnt)el("il",cnt+" item"+(cnt>1?"s":""),m[0],m[1]);
   if(isel){var tbx=el("etb",'<button title="Delete connection" aria-label="Delete connection">✕</button>',m[0],m[1]);tbx.onpointerdown=function(e){e.stopPropagation()};tbx.firstChild.onclick=function(){delEdge(a,oi,k)}}
  });
+ eachTypedEdge(function(a,type,oi,k,t){
+  var A=nb(a),B=nb(t.node);if(!A||!B)return;
+  var o=aiPortPoint(A,type,oi,"out"),i=aiPortPoint(B,type,t.index||0,"in");
+  var d="M"+o[0]+","+o[1]+" C"+o[0]+","+(o[1]+62)+" "+i[0]+","+(i[1]-62)+" "+i[0]+","+i[1];
+  var isel=sel&&sel.k==="ai"&&sel.a===a&&sel.type===type&&sel.oi===oi&&sel.k2===k;
+  var p=mk("path");p.setAttribute("d",d);p.setAttribute("class","e ai-edge"+(isel?" sel":""));p.setAttribute("stroke",type==="ai_tool"?"#10a37f":type==="ai_memory"?"#8b5cf6":type==="ai_languageModel"?"#0f9f86":"#d97706");W.appendChild(p);
+  var h=mk("path");h.setAttribute("d",d);h.setAttribute("class","hit");h.onpointerdown=function(e){e.stopPropagation();sel={k:"ai",a:a,type:type,oi:oi,k2:k};draw()};W.appendChild(h);
+  if(isel){var m=[(o[0]+i[0])/2,(o[1]+i[1])/2],tbx=el("etb",'<button title="Delete AI connection" aria-label="Delete AI connection">✕</button>',m[0],m[1]);tbx.onpointerdown=function(e){e.stopPropagation()};tbx.firstChild.onclick=function(){delTypedEdge(a,type,oi,k)}}
+ });
+
 }
 function hint(){var h=$("hint");h.hidden=!pend;h.textContent="Tap or drop on an input dot (left side of a node) to connect"}
 document.addEventListener("pointermove",function(e){
  if(drag){var dx=(e.clientX-drag.sx)/Z,dy=(e.clientY-drag.sy)/Z;if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<5)return;drag.moved=1;
   drag.n.position=[Math.max(-OX+10,Math.round((drag.ox+dx)/8)*8),Math.max(-OY+10,Math.round((drag.oy+dy)/8)*8)];draw()}
- else if(pend){var A=nb(pend.n);if(!A)return;var r=st.getBoundingClientRect(),o=pt(A,pend.o,info(A).outs.length,1),old=W.querySelector("path.tmp");if(old)W.removeChild(old);
-  var p=mk("path");p.setAttribute("class","tmp");p.setAttribute("d","M"+(o[0]+5)+","+o[1]+" L"+((e.clientX-r.left)/Z)+","+((e.clientY-r.top)/Z));W.appendChild(p)}
+ else if(pend){var A=nb(pend.n);if(!A)return;var r=st.getBoundingClientRect(),o=pend.type?aiPortPoint(A,pend.type,pend.o,"out"):pt(A,pend.o,info(A).outs.length,1),tx=(e.clientX-r.left)/Z,ty=(e.clientY-r.top)/Z,old=W.querySelector("path.tmp");if(old)W.removeChild(old);
+  var p=mk("path");p.setAttribute("class","tmp");p.setAttribute("d",pend.type?"M"+o[0]+","+o[1]+" C"+o[0]+","+(o[1]+55)+" "+tx+","+(ty-55)+" "+tx+","+ty:"M"+(o[0]+5)+","+o[1]+" C"+(o[0]+55)+","+o[1]+" "+(tx-55)+","+ty+" "+tx+","+ty);W.appendChild(p)}
 });
 document.addEventListener("pointerup",function(e){
  if(drag){var d=drag;drag=null;if(d.moved){save();return}
