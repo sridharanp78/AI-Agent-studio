@@ -1959,6 +1959,35 @@ function n8nTypeForStoreNode(label){
  ['item lists','n8n-nodes-base.itemLists'],
  ['no operation','n8n-nodes-base.noOp']
  ];
+ const exactCatalogOverrides=[
+ ['email trigger (imap)','n8n-nodes-base.emailReadImap'],
+ ['gmail trigger','n8n-nodes-base.gmailTrigger'],
+ ['google sheets trigger','n8n-nodes-base.googleSheetsTrigger'],
+ ['google calendar trigger','n8n-nodes-base.googleCalendarTrigger'],
+ ['google drive trigger','n8n-nodes-base.googleDriveTrigger'],
+ ['slack trigger','n8n-nodes-base.slackTrigger'],
+ ['telegram trigger','n8n-nodes-base.telegramTrigger'],
+ ['github trigger','n8n-nodes-base.githubTrigger'],
+ ['stripe trigger','n8n-nodes-base.stripeTrigger'],
+ ['typeform trigger','n8n-nodes-base.typeformTrigger'],
+ ['calendly trigger','n8n-nodes-base.calendlyTrigger'],
+ ['airtable trigger','n8n-nodes-base.airtableTrigger'],
+ ['notion trigger','n8n-nodes-base.notionTrigger'],
+ ['hubspot trigger','n8n-nodes-base.hubspotTrigger'],
+ ['shopify trigger','n8n-nodes-base.shopifyTrigger'],
+ ['jira trigger','n8n-nodes-base.jiraTrigger'],
+ ['postgres trigger','n8n-nodes-base.postgresTrigger'],
+ ['respond to webhook','n8n-nodes-base.respondToWebhook'],
+ ['compare datasets','n8n-nodes-base.compareDatasets'],
+ ['send email','n8n-nodes-base.emailSend'],
+ ['shopify','n8n-nodes-base.shopify'],
+ ['zoho crm','n8n-nodes-base.zohoCrm'],
+ ['woocommerce','n8n-nodes-base.wooCommerce'],
+ ['sftp','n8n-nodes-base.sftp'],
+ ['youtube','n8n-nodes-base.youTube']
+ ];
+ const exactType=exactCatalogOverrides.find(([key])=>x===key);
+ if(exactType)return exactType[1];
  for(const [key,type] of [...rules,...catalogRules])if(x===key||x.includes(key))return type;
  return 'n8n-nodes-base.noOp';
 }
