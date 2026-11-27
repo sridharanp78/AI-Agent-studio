@@ -265,7 +265,7 @@ var CATS=[
 "writeBinaryFile|Write Binary File|⇩|Write binary files",
 "extractFromCsv|Extract from CSV|CSV|Parse CSV data",
 "spreadsheetFile|Spreadsheet File|XLS|Read and write spreadsheet files",
-" sftp|SFTP|S|Transfer files securely",
+"sftp|SFTP|S|Transfer files securely",
 "googleSlides|Google Slides|G|Create and update presentations",
 "microsoftWord|Microsoft Word 365|W|Create and update documents",
 "youtube|YouTube|▶|Manage YouTube videos and playlists",
@@ -283,6 +283,8 @@ var CATS=[
 ]]
 
 ];
+/* Keep one palette entry per canonical n8n node type. */
+var _catalogSeen={};CATS.forEach(function(c){c[2]=c[2].filter(function(row){var k=row.split("|")[0];k=k.indexOf(".")>=0?k:P+k;if(_catalogSeen[k])return false;_catalogSeen[k]=1;return true})});
 var VER={if:2.2,merge:3.2,set:3.4,splitInBatches:3,code:2,wait:1.1,httpRequest:4.2,googleSheets:4.7,gmail:2.1,scheduleTrigger:1.2,webhook:2,filter:2.2,switch:3.2,removeDuplicates:2,summarize:1.1,dateTime:2,slack:2.3,discord:2,notion:2.2,airtable:2.1,googleDrive:3,googleCalendar:1.3,openAi:1.8,postgres:2.5,respondToWebhook:1.2,executeWorkflow:1.1,emailSend:2.1,telegram:1.2,formTrigger:2.2,executeWorkflowTrigger:1.1,mySql:2.4,mongoDb:1.2,hubspot:2,microsoftOutlook:2,microsoftTeams:2,microsoftExcel:2.2,googleDocs:2};
 var ICN={
 manualTrigger:'<svg viewBox="0 0 24 24"><path d="M8 3v11l3-2 2 5 2.4-1-2-5H17z" fill="none" stroke="#ff6d5a" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -414,7 +416,7 @@ function aiPorts(n){
 }
 function aiPortPoint(n,type,index,dir){
  var p=aiPorts(n),list=dir==="in"?p.inputs:p.outputs,idx=list.indexOf(type),count=list.length;
- return [n.position[0]+OX+100*(idx+1)/(count+1),n.position[1]+OY+(dir==="in"?100:0)]
+ return [n.position[0]+OX+100*(idx+1)/(count+1),n.position[1]+OY+100]
 }
 function drawAiPorts(n,x,y){
  var p=aiPorts(n);
@@ -546,7 +548,7 @@ function rename(o,nn){
  nn=nn.trim();if(!nn||nn===o)return"";if(nb(nn))return"exists";
  nb(o).name=nn;if(S.connections[o]){S.connections[nn]=S.connections[o];delete S.connections[o]}
  if(S.pinData&&S.pinData[o]){S.pinData[nn]=S.pinData[o];delete S.pinData[o]}if(RES[o]){RES[nn]=RES[o];delete RES[o]}if(vis[o]){vis[nn]=1;delete vis[o]}
- eachEdge(function(a,oi,k,t){if(t.node===o)t.node=nn});if(sel&&sel.n===o)sel.n=nn;if(ndvName===o)ndvName=nn;save();draw();return""}
+ eachEdge(function(a,oi,k,t){if(t.node===o)t.node=nn});eachTypedEdge(function(a,type,oi,k,t){if(t.node===o)t.node=nn});if(sel&&sel.n===o)sel.n=nn;if(ndvName===o)ndvName=nn;save();draw();return""}
 var DEF={code:{jsCode:"// Loop over input items and add a new field\n// called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"},set:{assignments:{assignments:[]},options:{}},if:{conditions:{options:{caseSensitive:true,leftValue:"",typeValidation:"strict",version:2},conditions:[{id:"c1",leftValue:"",rightValue:"",operator:{type:"string",operation:"equals"}}],combinator:"and"},options:{}},filter:{conditions:{options:{caseSensitive:true,leftValue:"",typeValidation:"strict",version:2},conditions:[{id:"c1",leftValue:"",rightValue:"",operator:{type:"string",operation:"equals"}}],combinator:"and"},options:{}},httpRequest:{method:"GET",url:"",options:{}},googleSheets:{documentId:{__rl:true,value:"",mode:"list"},sheetName:{__rl:true,value:"",mode:"list"},options:{}},gmail:{sendTo:"",subject:"",message:"",options:{}},splitInBatches:{options:{}},merge:{}};
 function addNode(type){
  var c=CAT[type],cv=$("cv"),x,y;
@@ -788,7 +790,7 @@ $("mReset").onclick=function(){$("menu").hidden=true;ask("Replace with the Cold 
 document.addEventListener("keydown",function(e){
  if(e.key==="Escape"){if(!$("md").hidden)$("md").hidden=true;else if(ndvName)closeNDV();else if(!$("nc").hidden)closeNC();else{pend=null;hint();draw()}return}
  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)||ndvName)return;
- if((e.key==="Delete"||e.key==="Backspace")&&sel){e.preventDefault();sel.k==="n"?delNode(sel.n):delEdge(sel.a,sel.oi,sel.k2)}});
+ if((e.key==="Delete"||e.key==="Backspace")&&sel){e.preventDefault();if(sel.k==="n")delNode(sel.n);else if(sel.k==="ai")delTypedEdge(sel.a,sel.type,sel.oi,sel.k2);else delEdge(sel.a,sel.oi,sel.k2)}});
 /* execute workflow */
 $("run").onclick=function(){
  if(busy)return;busy=1;vis={};execAll();draw();$("run").textContent="Executing workflow…";
