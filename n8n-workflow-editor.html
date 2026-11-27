@@ -918,7 +918,7 @@ $("authForm").addEventListener("submit",function(e){
     }).catch(function(){$("authError").textContent="Authentication is unavailable in this browser."});
   }
 });
-sessionStorage.setItem("workflowStudio.session",sessionStorage.getItem("workflowStudio.session")||"local-editor");$("authScreen").hidden=true;
+var activeWorkflowSession=sessionStorage.getItem("workflowStudio.session");$("authScreen").hidden=!!activeWorkflowSession;if(!activeWorkflowSession){$("authPassword").value="";setAuthMode("login");}
 $("logoutBtn").onclick=function(){
   sessionStorage.removeItem("workflowStudio.session");
   $("authPassword").value="";
