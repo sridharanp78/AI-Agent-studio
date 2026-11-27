@@ -613,6 +613,29 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
 .agent-flow-logo span{font-size:8px}
 .agent-gallery-top{grid-template-columns:82px minmax(0,1fr) 30px}
 @media(max-width:700px){.agent-flow-logo{width:66px;height:66px}.agent-flow-logo svg{width:34px;height:34px}.agent-gallery-top{grid-template-columns:72px minmax(0,1fr) 27px}}
+/* Balanced showcase layout: a little more card height and consistent alignment */
+.agent-category-grid{align-items:stretch}
+.agent-gallery-card{min-height:405px;padding:22px;display:flex;flex-direction:column;justify-content:flex-start;gap:0}
+.agent-gallery-top{grid-template-columns:76px minmax(0,1fr) 30px;gap:14px;min-height:220px;align-items:start}
+.agent-flow-logo{width:72px;height:72px;min-width:72px;align-self:start;margin-top:3px}
+.agent-flow-logo svg{width:36px;height:36px}
+.agent-gallery-main{min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.agent-gallery-title-row{width:100%;min-height:38px;align-items:flex-start}
+.agent-gallery-title-row h3{min-height:34px;display:flex;align-items:flex-start;overflow-wrap:anywhere}
+.agent-gallery-main p{width:100%;min-height:58px;max-height:58px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.55}
+.agent-gallery-main>.tag{min-height:30px;display:inline-flex;align-items:center;max-width:100%;overflow-wrap:anywhere}
+.agent-gallery-facts{min-height:30px;align-items:center;margin-top:12px}
+.agent-gallery-footer{min-height:48px;margin-top:15px;padding-top:12px;align-content:center}
+.agent-gallery-card .agent-card-actions{margin-top:auto;padding-top:17px;min-height:52px;align-items:stretch}
+.agent-gallery-card .agent-card-actions .btn{min-height:38px;white-space:nowrap}
+@media(max-width:700px){
+ .agent-gallery-card{min-height:390px;padding:17px}
+ .agent-gallery-top{grid-template-columns:66px minmax(0,1fr) 27px;gap:10px;min-height:218px}
+ .agent-flow-logo{width:62px;height:62px;min-width:62px}
+ .agent-flow-logo svg{width:32px;height:32px}
+ .agent-gallery-main p{min-height:62px;max-height:62px}
+ .agent-gallery-footer{min-height:54px}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
