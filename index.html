@@ -1855,6 +1855,19 @@ function openStoreTemplateN8nEditor(template){
  raw.forEach((item,i)=>{const src=item.source||{},label=String(src.type||src.title||'Node');let name=label,seq=2;while(used[name])name=label+' '+seq++;used[name]=1;let parameters={};try{parameters=src.appParameters?JSON.parse(src.appParameters):{}}catch(e){}if(item.type.includes('lmChatOpenAi'))parameters={model:{__rl:true,value:'gpt-4o-mini',mode:'list'},options:{temperature:0.2}};if(item.type.includes('memoryBufferWindow'))parameters={contextWindowLength:5};nodes.push({id:String(src.id||'store-'+stamp+'-'+i),name,type:item.type,typeVersion:1,position:[180+i*230,220+(support.some(k=>item.type.includes(k))?180:0)],parameters,notes:String(src.detail||src.step||''),notesInFlow:true});byId[String(src.id)]=name;item.name=name});
  const connections={};nodes.forEach(n=>connections[n.name]={main:[]});
  (source.links||[]).forEach(link=>{const from=byId[String(link.from)],to=byId[String(link.to)];if(!from||!to)return;const fi=raw.find(x=>x.name===from),ti=raw.find(x=>x.name===to);if((fi&&support.some(k=>fi.type.includes(k)))||(ti&&support.some(k=>ti.type.includes(k))))return;const branch=String(link.branch||'').toLowerCase(),oi=branch==='false'?1:branch.startsWith('case-')?Math.max(0,parseInt(branch.slice(5),10)-1):branch==='default'?2:0,arr=connections[from].main;while(arr.length<=oi)arr.push([]);arr[oi].push({node:to,type:'main',index:0})});
+ if(aiAgent&&aiAgent.index===-1){
+  const mainItems=raw.filter(item=>!support.some(k=>item.type.includes(k)));
+  const at=mainItems.indexOf(aiAgent),prev=mainItems[at-1],next=mainItems[at+1];
+  if(prev&&next){
+   const outs=connections[prev.name].main||[];
+   connections[prev.name].main=outs.map(arr=>(arr||[]).filter(edge=>edge.node!==next.name));
+   while(connections[prev.name].main.length&&!(connections[prev.name].main[connections[prev.name].main.length-1]||[]).length)connections[prev.name].main.pop();
+   if(!connections[prev.name].main.length)connections[prev.name].main=[[]];
+   connections[prev.name].main[0].push({node:aiAgent.name,type:'main',index:0});
+   connections[aiAgent.name].main[0]=[{node:next.name,type:'main',index:0}];
+  }else if(prev){connections[prev.name].main[0]=[{node:aiAgent.name,type:'main',index:0}]}
+  else if(next){connections[aiAgent.name].main[0]=[{node:next.name,type:'main',index:0}]}
+ }
  if(aiAgent)raw.forEach(item=>{if(item===aiAgent)return;let socket='';if(item.type.includes('.lmChat'))socket='ai_languageModel';else if(item.type.includes('.memory'))socket='ai_memory';else if(item.type.includes('.tool'))socket='ai_tool';else if(item.type.includes('.embeddings'))socket='ai_embedding';else if(item.type.includes('.vectorStore'))socket='ai_vectorStore';else if(item.type.includes('.retriever'))socket='ai_retriever';else if(item.type.includes('.outputParser'))socket='ai_outputParser';if(socket)connections[item.name][socket]=[[{node:aiAgent.name,type:socket,index:0}]]});
  const workflow={name:template.name+' · '+template.industry+' workflow',nodes,connections,active:false,settings:{executionOrder:'v1'},meta:{templateKey:template.key,industryId:template.industryId,industryPath:template.industryPath}};
  localStorage.setItem('ai-studio-n8n-editor-handoff',JSON.stringify(workflow));window.open('n8n-workflow-editor.html','_blank','noopener');
