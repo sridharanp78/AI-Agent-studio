@@ -282,6 +282,37 @@ var CATS=[
 "stopAndError|Stop and Error|✕|Stop execution with a custom error"
 ]]
 
+,["Agent Store integrations","#0f766e",[
+"microsoftSharePoint|Microsoft SharePoint|SP|Manage SharePoint files and lists",
+"firebase|Firebase|FB|Read and write Firebase records",
+"rabbitmq|RabbitMQ|MQ|Publish and consume queue messages",
+"kafka|Kafka|K|Publish and consume Kafka messages",
+"youTube|YouTube|▶|Manage YouTube videos and playlists",
+"linkedIn|LinkedIn|in|Manage LinkedIn organization content",
+"jotForm|Jotform|JF|Read form submissions",
+"calendly|Calendly|C|Manage events and invitees",
+"microsoftOneDrive|Microsoft OneDrive|OD|Manage OneDrive files",
+"microsoftExcel|Microsoft Excel 365|X|Read and update workbook tables",
+"microsoftTeams|Microsoft Teams|T|Send team messages",
+"microsoftOutlook|Microsoft Outlook|O|Manage email and calendar",
+"salesforce|Salesforce|SF|Manage CRM records",
+"pipedrive|Pipedrive|P|Manage deals and contacts",
+"whatsApp|WhatsApp Business Cloud|W|Send and receive WhatsApp messages",
+"twilio|Twilio|T|Send SMS and voice messages"
+]],
+["AI agent connectors","#10a37f",[
+"@n8n/n8n-nodes-langchain.chatTrigger|Chat Trigger|✦|Start an AI workflow from a chat message|t",
+"@n8n/n8n-nodes-langchain.mcpClientTool|MCP Client Tool|MCP|Connect an agent to tools exposed by an MCP server|o=",
+"@n8n/n8n-nodes-langchain.toolCode|Code Tool|{}|Expose code as an AI agent tool|o=",
+"@n8n/n8n-nodes-langchain.toolWorkflow|Call n8n Workflow Tool|↗|Expose another workflow as an AI agent tool|o=",
+"@n8n/n8n-nodes-langchain.outputParserStructured|Structured Output Parser|{}|Validate structured model output|o=",
+"@n8n/n8n-nodes-langchain.embeddingsOpenAi|OpenAI Embeddings|E|Create text embeddings|o=",
+"@n8n/n8n-nodes-langchain.vectorStoreInMemory|In-Memory Vector Store|V|Store and search vectors",
+"@n8n/n8n-nodes-langchain.memoryBufferWindow|Window Buffer Memory|M|Keep recent conversation context|o=",
+"@n8n/n8n-nodes-langchain.toolCalculator|Calculator Tool|＋|Give an AI agent calculator access|o=",
+"@n8n/n8n-nodes-langchain.toolHttpRequest|HTTP Request Tool|↔|Expose HTTP requests as an AI tool|o="
+]]
+
 ];
 /* Keep one palette entry per canonical n8n node type. */
 var _catalogSeen={};CATS.forEach(function(c){c[2]=c[2].filter(function(row){var k=row.split("|")[0];k=k.indexOf(".")>=0?k:P+k;if(_catalogSeen[k])return false;_catalogSeen[k]=1;return true})});
