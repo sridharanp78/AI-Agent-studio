@@ -1235,6 +1235,61 @@ body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
  body:has(#templateFlowTrack) .template-detail-side{grid-template-columns:1fr!important}
  body:has(#templateFlowTrack) .template-flow-legend{gap:9px!important}
 }
+
+/* Explicit blueprint focus mode: compact navigation and full-bleed workflow workspace */
+.app.blueprint-focus{width:100%;max-width:100%;overflow-x:hidden}
+.app.blueprint-focus>.sidebar{width:64px!important;min-width:64px!important;flex:0 0 64px!important;padding:14px 6px!important;overflow:visible!important}
+.app.blueprint-focus>.sidebar .brand{justify-content:center!important;padding:4px 0 18px!important}
+.app.blueprint-focus>.sidebar .brand>span:not(.logo),
+.app.blueprint-focus>.sidebar .workspace,
+.app.blueprint-focus>.sidebar .nav-label,
+.app.blueprint-focus>.sidebar .nav-text,
+.app.blueprint-focus>.sidebar .count,
+.app.blueprint-focus>.sidebar .profile>div:not(.avatar){display:none!important}
+.app.blueprint-focus>.sidebar .nav button{height:42px!important;justify-content:center!important;padding:8px 4px!important}
+.app.blueprint-focus>.sidebar .nav button .ico{font-size:17px!important}
+.app.blueprint-focus>.sidebar .profile{justify-content:center!important}
+.app.blueprint-focus>.main{flex:1 1 calc(100% - 64px)!important;width:calc(100% - 64px)!important;min-width:0!important;max-width:none!important;margin:0!important}
+.app.blueprint-focus>.main>.content{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:18px clamp(18px,2.2vw,42px) 42px!important;overflow-x:hidden!important}
+.app.blueprint-focus .page-head{width:100%!important;max-width:none!important;margin-bottom:14px!important}
+.app.blueprint-focus .template-detail-hero,.app.blueprint-focus .template-flow-panel{width:100%!important;max-width:none!important}
+.app.blueprint-focus .template-detail-hero{min-height:105px!important;padding:18px 24px!important;margin-bottom:14px!important}
+.app.blueprint-focus .template-detail-hero h2{font-size:25px!important}
+.app.blueprint-focus .template-flow-panel{padding:22px 24px 18px!important;margin-bottom:16px!important}
+.app.blueprint-focus .template-flow-panel h2{font-size:23px!important}
+.app.blueprint-focus .template-flow-scroll{width:100%!important;max-width:none!important;min-height:390px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:40px 18px 42px!important;background:linear-gradient(#fffaf6,#fffaf6) padding-box!important;border:1px solid #f1e0d6!important;border-radius:14px!important}
+.app.blueprint-focus .template-flow-track{width:max-content!important;min-width:100%!important;min-height:300px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:48px!important;padding:24px 28px!important}
+.app.blueprint-focus .template-flow-node{flex:0 0 258px!important;width:258px!important;min-height:220px!important;height:auto!important;padding:20px!important;border-radius:15px!important;box-shadow:0 8px 24px #9b5b2516!important}
+.app.blueprint-focus .template-flow-node-icon{width:54px!important;height:54px!important;font-size:26px!important;border-radius:13px!important;margin-bottom:14px!important}
+.app.blueprint-focus .template-flow-node-kind{font-size:11px!important;letter-spacing:.7px!important}
+.app.blueprint-focus .template-flow-node b{font-size:15px!important;line-height:1.5!important;margin:10px 0!important}
+.app.blueprint-focus .template-flow-node small{font-size:11px!important;line-height:1.5!important}
+.app.blueprint-focus .template-flow-link{width:48px!important;flex:0 0 48px!important;align-self:center!important}
+.app.blueprint-focus .template-flow-link:before{width:11px!important;height:11px!important}
+.app.blueprint-focus .template-flow-legend{padding-top:15px!important;font-size:11px!important;gap:20px!important}
+.app.blueprint-focus .template-detail-columns{width:100%!important;max-width:none!important;grid-template-columns:minmax(0,1.7fr) minmax(320px,.8fr)!important;gap:16px!important}
+.app.blueprint-focus .template-detail-columns>.panel,.app.blueprint-focus .template-detail-side>.panel{padding:20px!important}
+.app.blueprint-focus .template-explanation-step{padding:16px 10px!important}
+.app.blueprint-focus .template-explanation-step h3{font-size:14px!important}
+.app.blueprint-focus .template-explanation-step p{font-size:12px!important}
+@media(max-width:900px){
+ .app.blueprint-focus>.sidebar{width:56px!important;min-width:56px!important;flex-basis:56px!important}
+ .app.blueprint-focus>.main{width:calc(100% - 56px)!important;flex-basis:calc(100% - 56px)!important}
+ .app.blueprint-focus>.main>.content{padding:14px 12px 30px!important}
+ .app.blueprint-focus .template-detail-columns{grid-template-columns:1fr!important}
+ .app.blueprint-focus .template-detail-side{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:620px){
+ .app.blueprint-focus>.sidebar{width:0!important;min-width:0!important;flex-basis:0!important;padding:0!important;overflow:hidden!important}
+ .app.blueprint-focus>.main{width:100%!important;flex-basis:100%!important}
+ .app.blueprint-focus>.main>.content{padding:12px 10px 28px!important}
+ .app.blueprint-focus .template-flow-panel{padding:13px!important}
+ .app.blueprint-focus .template-flow-scroll{min-height:320px!important;padding:25px 8px!important}
+ .app.blueprint-focus .template-flow-track{min-height:260px!important;gap:30px!important}
+ .app.blueprint-focus .template-flow-node{flex-basis:220px!important;width:220px!important;min-height:190px!important;padding:15px!important}
+ .app.blueprint-focus .template-flow-node b{font-size:13px!important}
+ .app.blueprint-focus .template-detail-side{grid-template-columns:1fr!important}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
@@ -1471,7 +1526,7 @@ function schedulesPage(){const items=[['Daily research digest','Weekdays · 08:0
 function analyticsPage(){const bars=[['Mon',42],['Tue',68],['Wed',54],['Thu',86],['Fri',63],['Sat',34],['Sun',72]];return head('Usage & analytics','Understand agent activity, execution health and model consumption.','<span class="tag">Sample workspace data</span>')+'<div class="cards">'+stat('Total runs','1,284','This month','▷')+stat('Tokens consumed','2.8M','Across all models','◈')+stat('Average latency','2.4s','Illustrative metric','◷')+stat('Failed runs','21','1.6% sample rate','!')+'</div><div class="analytics-grid"><section class="panel"><div class="panel-head"><div><h3>Execution activity</h3><div class="panel-sub">Illustrative runs across the last seven days.</div></div><span class="tag">7 days</span></div><div class="activity-chart">'+bars.map(x=>'<div class="activity-bar"><span>'+x[1]+'</span><i style="height:'+x[1]+'%"></i><small>'+x[0]+'</small></div>').join('')+'</div></section><section class="panel"><div class="panel-head"><div><h3>Model distribution</h3><div class="panel-sub">Example request share by model.</div></div></div><div class="model-share"><div><span>GPT-4o mini</span><b>48%</b><i><em style="width:48%"></em></i></div><div><span>GPT-4o</span><b>27%</b><i><em style="width:27%"></em></i></div><div><span>Claude Sonnet</span><b>16%</b><i><em style="width:16%"></em></i></div><div><span>Other</span><b>9%</b><i><em style="width:9%"></em></i></div></div></section></div><section class="panel"><div class="panel-head"><div><h3>Recent execution activity</h3><div class="panel-sub">Example records for layout preview only.</div></div><button class="btn" data-action="view-runs">View all runs →</button></div>'+[['Research Assistant','Completed','4,820 tokens','10:42'],['Lead Qualification','Completed','2,140 tokens','10:18'],['Support Triage','Failed','—','09:54']].map(x=>'<div class="resource-row"><div class="resource-icon">▷</div><div style="flex:1"><b>'+x[0]+'</b><p>'+x[2]+' · Today, '+x[3]+'</p></div><span class="tag">'+x[1]+'</span></div>').join('')+'</section>'}
 function settingsPage(){return head('Workspace settings','Manage workspace preferences, access and safety defaults.','<button class="btn primary" id="saveSettings">Save changes</button>')+'<div class="settings-layout"><nav class="panel settings-nav"><div class="section-kicker">WORKSPACE</div><a class="active">General</a><a>Members & roles</a><a>Security</a><a>Notifications</a><a>Advanced</a></nav><div class="settings-content"><section class="panel"><div class="panel-head"><div><h3>General preferences</h3><div class="panel-sub">Basic information for your AI Agent Studio workspace.</div></div><span class="tag">Workspace</span></div><div class="field"><label>Workspace name</label><input id="workspaceName" value="My workspace"></div><div class="form-grid"><div class="field"><label>Default timezone</label><select id="workspaceTimezone"><option>Asia/Kolkata (UTC+05:30)</option><option>UTC</option><option>Asia/Singapore</option></select></div><div class="field"><label>Default language</label><select><option>English</option><option>தமிழ்</option></select></div></div></section><section class="panel"><div class="panel-head"><div><h3>Security & governance</h3><div class="panel-sub">Illustrative workspace-level preferences.</div></div></div>'+['Require approval for external actions','Enable audit logging','Restrict public agent publishing','Show tool activity in Playground'].map((x,i)=>'<div class="switch-row"><span>'+x+'</span><div class="switch '+(i!==2?'on':'')+'" data-switch></div></div>').join('')+'</section><section class="panel"><h3>Workspace access</h3><div class="resource-row"><div class="resource-icon">♙</div><div style="flex:1"><b>Workspace owner</b><p>Owner permissions · Current session</p></div><span class="tag">Owner</span></div><p class="panel-sub">Member invitations and role management will be enabled when workspace authentication is configured.</p></section></div></div>'}
 function simplePage(title,sub,items,action){return head(title,sub,action||'')+'<div class="agent-grid">'+items.map((x,i)=>'<div class="agent-card"><div class="agent-icon">'+['⌘','▤','◷','✧'][i%4]+'</div><h3>'+x[0]+'</h3><p>'+x[1]+'</p><div class="meta"><span class="status">● Available</span><button class="btn" data-action="connect">Configure →</button></div></div>').join('')+'</div>'}
-function render(page){current=page;if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===(page==='editor'?'agents':page)));window.scrollTo({top:0,behavior:'smooth'});document.getElementById('crumb').textContent=({overview:'Overview',agents:'Agents','agent-detail':'Agent details',editor:'Agent builder',workflows:'Workflows',crews:'Multi-agent crews',playground:'Playground',knowledge:'Knowledge base',integrations:'Integrations',schedules:'Schedules & triggers',store:'Agent Store','store-agent-detail':'Agent blueprint',analytics:'App usage',settings:'Settings',tools:'Tools & models',drive:'Agent Drive',docs:'Docs & API',billing:'Plans & billing'})[page]||page;let html='';
+function render(page){document.querySelector('.app')?.classList.toggle('blueprint-focus',page==='store-agent-detail'||page==='agent-detail');current=page;if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===(page==='editor'?'agents':page)));window.scrollTo({top:0,behavior:'smooth'});document.getElementById('crumb').textContent=({overview:'Overview',agents:'Agents','agent-detail':'Agent details',editor:'Agent builder',workflows:'Workflows',crews:'Multi-agent crews',playground:'Playground',knowledge:'Knowledge base',integrations:'Integrations',schedules:'Schedules & triggers',store:'Agent Store','store-agent-detail':'Agent blueprint',analytics:'App usage',settings:'Settings',tools:'Tools & models',drive:'Agent Drive',docs:'Docs & API',billing:'Plans & billing'})[page]||page;let html='';
 if(page==='tools')html=toolsPage();if(page==='drive')html=drivePage();if(page==='docs')html=docsPage();if(page==='billing')html=billingPage();if(page==='overview')html=dashboard();if(page==='agents')html=agentsPage();if(page==='agent-detail')html=agentDetailPage();if(page==='editor')html=editor();if(page==='workflows')html=workflows();if(page==='playground')html=playground();
 if(page==='crews')html=crewsPage();
 if(page==='knowledge')html=knowledgePage();
