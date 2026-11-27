@@ -443,9 +443,9 @@ function aiPorts(n){
  if(k==="toolCalculator"||k==="toolHttpRequest"||k==="toolCode"||k==="toolWorkflow"||k==="toolSerpApi"||k==="toolWikipedia"||k==="toolVectorStore"||k==="mcpClientTool")O=["ai_tool"];
  if(k.indexOf("memory")===0)O=["ai_memory"];
  if(k.indexOf("embeddings")===0)O=["ai_embedding"];
- if(k.indexOf("vectorStore")===0){I=["ai_embedding"];O=["ai_vectorStore"]}
+ if(k.indexOf("vectorStore")===0){I=["ai_embedding","ai_document"];O=["ai_vectorStore"]}
  if(k.indexOf("retriever")===0){I=["ai_vectorStore"];O=["ai_retriever"]}
- if(k.indexOf("document")===0)O=["ai_document"];
+ if(k.indexOf("document")===0){I=["ai_textSplitter"];O=["ai_document"]}
  if(k.indexOf("textSplitter")===0)O=["ai_textSplitter"];
  if(k.indexOf("outputParser")===0)O=["ai_outputParser"];
  return{inputs:I,outputs:O}
