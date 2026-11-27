@@ -385,6 +385,89 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
 .canvas .node[role="group"]{cursor:grab}
 .canvas .node[role="group"]:focus-visible{z-index:6}
 .canvas-tools #connectHint:after{content:"  ·  Arrows: move  ·  +/-: zoom  ·  0: reset  ·  F: fit";color:#7f8ca3}
+
+/* Workflow canvas visual hierarchy refinement */
+.canvas#canvas{
+  min-height:680px;
+  background-color:#0a0f19;
+  background-image:radial-gradient(rgba(142,157,184,.24) 1px,transparent 1px),linear-gradient(rgba(113,128,158,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(113,128,158,.035) 1px,transparent 1px);
+  background-size:24px 24px,120px 120px,120px 120px;
+  border:1px solid #303b50;
+  border-radius:15px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),inset 0 0 100px rgba(0,0,0,.22);
+}
+.canvas#canvas .node{
+  width:210px;
+  min-height:112px;
+  padding:14px 15px 13px;
+  border:1px solid #3b4962;
+  border-radius:13px;
+  background:linear-gradient(145deg,#1b2637 0%,#141c2a 100%);
+  box-shadow:0 12px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045);
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.canvas#canvas .node:hover{
+  border-color:#8874d9;
+  background:linear-gradient(145deg,#222d42 0%,#171f30 100%);
+  box-shadow:0 15px 34px rgba(0,0,0,.34),0 0 0 2px rgba(151,126,255,.10);
+}
+.canvas#canvas .node b{
+  display:block;
+  color:#f0f3fb;
+  font-size:13px;
+  line-height:1.4;
+  letter-spacing:-.15px;
+  overflow-wrap:anywhere;
+}
+.canvas#canvas .node small{
+  color:#a0adc1;
+  font-size:10px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+.canvas#canvas .node .node-type{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin:0 0 9px;
+  padding:4px 7px;
+  border:1px solid rgba(169,153,255,.24);
+  border-radius:6px;
+  background:rgba(139,120,246,.10);
+  color:#c2b5ff;
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:.9px;
+}
+.canvas#canvas .node.node-selected{
+  border-color:#a18cff;
+  background:linear-gradient(145deg,#292543,#192235);
+  box-shadow:0 0 0 3px rgba(161,140,255,.16),0 16px 34px rgba(0,0,0,.34);
+}
+.canvas#canvas .node.node-dragging{z-index:8;opacity:.97}
+.canvas#canvas .workflow-links path{
+  stroke:#9280e8;
+  stroke-width:2.5;
+  filter:drop-shadow(0 0 3px rgba(146,128,232,.28));
+}
+.canvas#canvas .workflow-group-frame{
+  border-color:rgba(169,153,255,.52);
+  border-radius:17px;
+  background:linear-gradient(145deg,rgba(124,103,224,.075),rgba(124,103,224,.025));
+}
+.canvas#canvas .workflow-group-label{
+  top:9px;
+  padding:5px 10px;
+  background:#211d36;
+  color:#d2c9ff;
+}
+@media(max-width:700px){
+  .canvas#canvas{min-height:680px;height:680px;background-size:22px 22px,110px 110px,110px 110px}
+  .canvas#canvas .node{width:196px;min-height:108px;padding:12px}
+  .canvas#canvas .node b{font-size:12px}
+}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
