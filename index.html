@@ -207,6 +207,28 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
 #nodeConfigPanel{scroll-margin-top:76px}
 @media(max-width:700px){#nodeConfigPanel{scroll-margin-top:18px}.node{touch-action:none}}
 
+/* Workflow node interaction polish */
+.canvas .node{position:absolute;isolation:isolate;cursor:grab;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease}
+.canvas .node:hover{transform:translateY(-2px);border-color:#65749a;box-shadow:0 14px 30px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07)}
+.canvas .node:focus-visible{outline:2px solid #b5a5ff!important;outline-offset:4px}
+.canvas .node.node-selected{transform:translateY(-2px);border-color:#a995ff;box-shadow:0 0 0 3px rgba(169,149,255,.2),0 16px 34px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)}
+.canvas .node.node-dragging{transform:scale(1.015);cursor:grabbing;transition:none;z-index:8}
+.canvas .node:after{content:"";right:-7px;top:calc(50% - 6px);width:10px;height:10px;border:2px solid #a995ff;background:#101725;box-shadow:0 0 0 4px rgba(169,149,255,.13);transition:background .15s,box-shadow .15s}
+.canvas .node:hover:after,.canvas .node.node-selected:after{background:#c2b5ff;box-shadow:0 0 0 5px rgba(169,149,255,.2)}
+.canvas .node[data-run-state="running"]{border-color:#65bdf4;box-shadow:0 0 0 3px rgba(101,189,244,.13),0 12px 28px rgba(0,0,0,.34)}
+.canvas .node[data-run-state="running"]:before{background:#65bdf4;box-shadow:0 0 12px #65bdf4}
+.canvas .node[data-run-state="completed"]{border-color:#39c99a}
+.canvas .node[data-run-state="completed"]:before{background:#39c99a}
+.canvas .node[data-run-state="skipped"]{border-color:#e4b65e;opacity:.78}
+.canvas .node[data-run-state="skipped"]:before{background:#e4b65e}
+.canvas .node[data-run-state="failed"]{border-color:#f07878;box-shadow:0 0 0 3px rgba(240,120,120,.12),0 12px 28px rgba(0,0,0,.34)}
+.canvas .node[data-run-state="failed"]:before{background:#f07878}
+.canvas .node .node-run-badge{display:inline-flex;align-items:center;gap:5px;margin:10px 0 0;padding:4px 7px;border-radius:6px;background:#ffffff0b;color:#b9c4d7;font-size:9px;font-weight:750;letter-spacing:.35px}
+.canvas .node[data-run-state="running"] .node-run-badge{color:#8bd2ff;background:#65bdf41a}
+.canvas .node[data-run-state="completed"] .node-run-badge{color:#6fe0b5;background:#39c99a18}
+.canvas .node[data-run-state="skipped"] .node-run-badge{color:#f0ca79;background:#e4b65e18}
+.canvas .node[data-run-state="failed"] .node-run-badge{color:#ff9a9a;background:#f0787818}
+@media(hover:none){.canvas .node:hover{transform:none}}
 /* Workflow canvas visual refresh */
 .canvas{
   height:620px;min-height:620px;overflow:auto;isolation:isolate;
