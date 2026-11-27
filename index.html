@@ -468,6 +468,42 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
   .canvas#canvas .node b{font-size:12px}
 }
 
+
+/* Keep workflow nodes on a usable horizontal workspace on phones */
+@media(max-width:700px){
+  .canvas#canvas{
+    width:100%;
+    min-width:0;
+    height:620px;
+    min-height:620px;
+    overflow:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .canvas#canvas .node{
+    width:196px;
+    max-width:none;
+  }
+  .canvas-tools{
+    align-items:stretch;
+  }
+  .canvas-tools .node-palette-search{
+    flex:1 0 100%;
+  }
+  .canvas-tools .canvas-zoom-controls{
+    margin-left:auto;
+  }
+  .canvas-tools #connectHint{
+    flex:1 0 100%;
+  }
+  #nodeConfigPanel .node-config-intro{
+    align-items:flex-start;
+  }
+  #nodeConfigPanel .node-config-step{
+    display:none;
+  }
+}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
