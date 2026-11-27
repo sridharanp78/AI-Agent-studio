@@ -991,7 +991,14 @@ html,body,.app,.main,.content,.page,.workspace,.page-content{background:#fffaf6!
 .template-flow-node.trigger{border-top-color:#df794b}.template-flow-node.logic{border-top-color:#d5a33f}.template-flow-node.ai{border-top-color:#a37bd2}.template-flow-node.app{border-top-color:#5b9fbd}.template-flow-node.data{border-top-color:#70a68a}
 .template-flow-node-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#fff0e7;color:#bd5735;font-size:17px;margin-bottom:10px}
 .template-flow-node-kind{font-size:9px;color:#b56b4d;text-transform:uppercase;letter-spacing:.6px}.template-flow-node b{font-size:12px;line-height:1.4;margin:6px 0}.template-flow-node small{font-size:10px;color:var(--muted)}
-.template-flow-link{width:48px;flex:0 0 48px;display:grid;place-items:center;color:#cf754c;font-size:23px}
+.template-flow-node{overflow:visible;position:relative}
+.template-flow-node:before{content:"";position:absolute;left:-6px;top:50%;width:10px;height:10px;border:2px solid #d98a65;border-radius:50%;background:#fff;transform:translateY(-50%);z-index:2}
+.template-flow-node:after{content:"";position:absolute;right:-6px;top:50%;width:10px;height:10px;border:2px solid #d98a65;border-radius:50%;background:#fff;transform:translateY(-50%);z-index:2}
+.template-flow-node:first-child:before{display:none}
+.template-flow-node:last-child:after{display:none}
+.template-flow-link{width:58px;height:2px;flex:0 0 58px;position:relative;background:linear-gradient(90deg,#e8b79e,#d77b52);font-size:0}
+.template-flow-link:after{content:"";position:absolute;right:0;top:50%;width:8px;height:8px;border-top:2px solid #d77b52;border-right:2px solid #d77b52;transform:translateY(-50%) rotate(45deg)}
+.template-flow-link:before{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:#d77b52;transform:translate(-50%,-50%)}
 .template-flow-legend{display:flex;gap:15px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:13px;color:var(--muted);font-size:10px}
 .template-detail-columns{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:18px;align-items:start}
 .template-explanation-step{display:grid;grid-template-columns:40px 1fr;gap:13px;padding:16px 0;border-top:1px solid var(--line)}
