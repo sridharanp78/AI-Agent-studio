@@ -2022,13 +2022,13 @@ function storeN8nNodePosition(item,raw,support){
  const supportNode=support.some(k=>item.type.includes(k));
  const main=raw.filter(x=>!support.some(k=>x.type.includes(k)));
  const mainIndex=Math.max(0,main.indexOf(item));
- if(!supportNode)return [180+mainIndex*220,200];
+ if(!supportNode)return [180+mainIndex*240,200];
  const agent=raw.find(x=>x.type==='@n8n/n8n-nodes-langchain.agent');
  const agentIndex=Math.max(0,main.indexOf(agent));
- const aiX=180+agentIndex*220;
+ const aiX=180+agentIndex*240;
  const supporting=raw.filter(x=>support.some(k=>x.type.includes(k)));
  const index=Math.max(0,supporting.indexOf(item));
- return [aiX-240+(index%3)*240,440+Math.floor(index/3)*190];
+ return [aiX-250+(index%3)*250,440+Math.floor(index/3)*190];
 }
 function storeN8nNodeVersion(type){
  const key=String(type||'').split('.').pop();
