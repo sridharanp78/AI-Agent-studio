@@ -2061,7 +2061,7 @@ function openStoreTemplateN8nEditor(template){
   else if(next){connections[aiAgent.name].main[0]=[{node:next.name,type:'main',index:0}]}
  }
  if(aiAgent){
-  raw.forEach(item=>{if(item===aiAgent)return;let socket='';if(item.type.includes('.lmChat'))socket='ai_languageModel';else if(item.type.includes('.memory'))socket='ai_memory';else if(item.type.includes('.tool'))socket='ai_tool';else if(item.type.includes('.outputParser'))socket='ai_outputParser';if(socket)connections[item.name][socket]=[[{node:aiAgent.name,type:socket,index:0}]]});
+  raw.forEach(item=>{if(item===aiAgent)return;let socket='';if(item.type.includes('.lmChat'))socket='ai_languageModel';else if(item.type.includes('.memory'))socket='ai_memory';else if(item.type.includes('.tool')||item.type.includes('.mcpClientTool'))socket='ai_tool';else if(item.type.includes('.outputParser'))socket='ai_outputParser';if(socket)connections[item.name][socket]=[[{node:aiAgent.name,type:socket,index:0}]]});
   const embeddings=raw.filter(item=>item.type.includes('.embeddings')),vectors=raw.filter(item=>item.type.includes('.vectorStore')),documents=raw.filter(item=>item.type.includes('.document')),splitters=raw.filter(item=>item.type.includes('.textSplitter')),retrievers=raw.filter(item=>item.type.includes('.retriever'));
   function connectAiOutput(from,to,socket){if(from&&to)connections[from.name][socket]=[[{node:to.name,type:socket,index:0}]]}
   vectors.forEach(vector=>{connectAiOutput(embeddings[0],vector,'ai_embedding');connectAiOutput(documents[0],vector,'ai_document')});
