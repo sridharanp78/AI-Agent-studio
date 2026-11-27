@@ -1907,7 +1907,7 @@ if(aiOutputType&&!n.querySelector('.node-ai-output-port')){
 if(/ai agent/.test(aiType)){
  [['ai_languageModel','Model'],['ai_memory','Memory'],['ai_tool','Tool']].forEach(([type,label],index)=>{
   const port=document.createElement('button');port.type='button';port.className='node-ai-input-port';port.dataset.connectionType=type;port.textContent=label;port.title='AI '+label+' input';port.setAttribute('aria-label',port.title);port.style.left=(24+index*37)+'px';
-  port.onclick=e=>{e.preventDefault();e.stopPropagation();chooseWorkflowNode(n,type)};
+  port.onclick=e=>{e.preventDefault();e.stopPropagation();if(!connectStart){toast('Select a matching AI output first');return}chooseWorkflowNode(n,type)};
   n.appendChild(port)
  })
 }
