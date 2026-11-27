@@ -31,7 +31,7 @@ svg.w{position:absolute;inset:0;pointer-events:none}
 svg.w path.e{fill:none;stroke:var(--wire);stroke-width:2}svg.w path.e.run{stroke:var(--ok)}svg.w path.e.sel{stroke:var(--pri);stroke-width:3}
 svg.w path.hit{fill:none;stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:pointer}
 svg.w path.tmp{fill:none;stroke:var(--pri);stroke-width:2;stroke-dasharray:5 4}
-.nw{position:absolute;width:210px;height:145px}
+.nw{position:absolute;width:220px;height:155px}
 .n{width:100%;height:100%;background:var(--node);border:1px solid #ead8ce;border-top:4px solid var(--node-accent,var(--pri));border-radius:13px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;cursor:grab;padding:12px 14px;text-align:left;touch-action:none;transition:border-color .2s,box-shadow .2s;box-shadow:0 7px 18px rgba(155,91,37,.07)}
 .n.trg{border-radius:13px}
 .nw:hover .n,.nw.sel .n{border-color:var(--pri)}
@@ -452,7 +452,7 @@ function aiPorts(n){
 }
 function aiPortPoint(n,type,index,dir){
  var p=aiPorts(n),list=dir==="in"?p.inputs:p.outputs,idx=list.indexOf(type),count=list.length;
- return [n.position[0]+OX+210*(idx+1)/(count+1),n.position[1]+OY+145]
+ return [n.position[0]+OX+220*(idx+1)/(count+1),n.position[1]+OY+155]
 }
 function drawAiPorts(n,x,y){
  var p=aiPorts(n);
@@ -567,7 +567,7 @@ function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+M
 var DB={list:[]},CUR=null;
 function loadDB(){var o=null,f=null;try{var t=localStorage.getItem("n8n-cold-mail-v5");if(t){o=JSON.parse(t);if(o&&Array.isArray(o.list))return o}}catch(e){}try{var t4=localStorage.getItem(KEY);if(t4){var q=JSON.parse(t4);if(q&&q.nodes)f=q}}catch(e){}return{list:[{id:uid(),wf:f||clone(SEED),updated:Date.now()}]}}
 function uniq(b){if(!nb(b))return b;var k=1;while(nb(b+k))k++;return b+k}
-function pt(n,i,t,out){return[n.position[0]+OX+(out?210:0),n.position[1]+OY+145*(i+1)/(t+1)]}
+function pt(n,i,t,out){return[n.position[0]+OX+(out?220:0),n.position[1]+OY+155*(i+1)/(t+1)]}
 function tidy(a){var c=S.connections[a];if(!c)return;var m=c.main||[];while(m.length&&!(m[m.length-1]||[]).length)m.pop();if(!m.length)delete S.connections[a]}
 function parentsOf(name){var r=[];eachEdge(function(a,o,k,t){if(t.node===name)r.push({a:a,o:o,i:t.index||0})});return r}
 function sub(n){var p=n.parameters||{},k=skey(n);if(APP[k]&&k!=="postgres"&&k!=="mySql"&&k!=="mongoDb"&&k!=="redis"){var a=APP[k],r=p.resource||a.ord[0],o=p.operation||(a.r[r]||[])[0];return o+": "+r}if(APP[k])return(p.operation||APP[k].r[""][0]);return""}
