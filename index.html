@@ -709,6 +709,94 @@ button:focus-visible,[tabindex]:focus-visible{outline-color:#e8794d!important}
 .agent-detail-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.agent-detail-metrics>div{padding:13px;border:1px solid var(--line);border-radius:10px}.agent-detail-metrics b,.agent-detail-metrics small{display:block}.agent-detail-metrics b{font-size:22px}.agent-detail-metrics small,.agent-detail-step small,.agent-detail-doc small{color:var(--muted);margin-top:4px}
 .agent-detail-flow{display:grid;justify-items:start;gap:5px}.agent-detail-step{display:flex;align-items:center;gap:12px;width:min(100%,520px);padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--panel2)}.agent-detail-step>div{min-width:0}.agent-detail-step small{display:block}.agent-detail-step-num{width:27px;height:27px;border-radius:8px;background:#fff0e6;color:#c64a31;display:grid;place-items:center;flex:0 0 27px}.agent-detail-connector{padding-left:12px;color:#e8794d}.agent-detail-doc{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.agent-detail-doc>div{flex:1;min-width:0}.agent-detail-empty{padding:18px;border:1px dashed var(--line);border-radius:11px}.agent-detail-empty p{color:var(--muted)}.agent-detail-instructions{white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto;font:inherit;font-size:13px;color:var(--muted)}
 @media(min-width:900px){.agent-detail-layout{grid-template-columns:1fr 1fr}}@media(max-width:560px){.agent-detail-title{align-items:flex-start}.agent-detail-title .agent-flow-logo{width:58px;height:58px;flex:0 0 58px}.agent-detail-metrics{grid-template-columns:1fr 1fr}}
+
+/* DAYLIGHT THEME completion — remove remaining legacy dark surfaces */
+:root{color-scheme:light!important}
+.sidebar,.workspace,.topbar,.icon-btn,.global-search,.global-search kbd,.palette-search kbd,
+.preview-pill,.store-hero,.store-hero-mark,.store-note,.store-filter,.playground-nav-panel,
+.playground-settings,.playground-mode,.playground-mode>span:first-child,.playground-main,
+.playground-ready,.play-history-item,.play-history-row,.play-history-item:hover,
+.play-history-item.selected,.play-history-row.selected,.play-agent-item,.play-agent-avatar,
+.chat-stage,.chat-stage .bubble.assistant,.chat-compose,.chat-compose-meta kbd,
+.prompt-suggestions button,.message-action,.provider-runtime-note,.crew-hero,.crew-flow span,
+.settings-nav a.active,.settings-nav a:hover,.overview-banner,.docs-hero,.drive-summary,
+.billing-hero,.overview-orbit,.docs-mark,.getting-started>div>b,.docs-step>b,.health-icon,
+.docs-code,.docs-code-block,.billing-free,.model-share i,.command-palette,.palette-item,
+.palette-item .palette-icon,.palette-search,.palette-results,.store-template-details,
+.store-template-details summary,.store-model-showcase,.canvas-tools,.canvas-tools .btn,
+.canvas-tools #connectNodes,.canvas-tools #autoArrangeNodes,.canvas-tools #centerWorkflowCanvas,
+#nodeConfigPanel,.n8n-node-library details,.n8n-node-grid button,.node-palette-search,
+.canvas .node,.canvas#canvas .node,.canvas#canvas .workflow-group-label,.canvas .workflow-group-label{
+ background:#fff!important;color:#34251f!important;border-color:#efddd2!important;
+ box-shadow:0 5px 18px rgba(112,62,38,.045)!important
+}
+.workspace,.store-hero,.crew-hero,.overview-banner,.docs-hero,.drive-summary,.billing-hero,
+.playground-nav-panel,.playground-settings,.playground-main,#nodeConfigPanel{
+ background:linear-gradient(135deg,#fff,#fff4ec)!important
+}
+.store-hero-mark,.overview-orbit,.docs-mark,.getting-started>div>b,.docs-step>b,.health-icon,
+.palette-item .palette-icon,.play-agent-avatar,.playground-mode>span:first-child{
+ background:#fff0e6!important;color:#d64a32!important;border-color:#f0cbb8!important
+}
+.preview-pill,.playground-ready{background:#fff1e8!important;color:#bd5735!important;border-color:#f0d2c2!important}
+.global-search,.palette-search,.palette-item,.play-history-item,.play-history-row,
+.play-agent-item,.playground-mode,.prompt-suggestions button,.message-action,
+.crew-flow span,.n8n-node-grid button,.node-palette-search,.store-filter{
+ background:#fffaf6!important;color:#59443a!important;border-color:#ead8cd!important
+}
+.store-filter.active,.store-filter:hover,.playground-mode.active,.playground-mode:hover,
+.play-agent-item:hover,.play-agent-item.selected,.play-history-item:hover,
+.play-history-item.selected,.play-history-row.selected,.settings-nav a.active,.settings-nav a:hover{
+ background:#fff0e6!important;color:#c83f2e!important;border-color:#e8794d!important
+}
+.chat-stage{background:#fffaf7!important}
+.chat-compose{background:#fff!important;border-color:#ead8cd!important}
+.chat-stage .bubble.assistant{background:#fff!important;color:#49352b!important;border-color:#efdfd6!important}
+.prompt-suggestions button{background:#fffaf6!important;color:#59443a!important}
+.provider-runtime-note,.store-note{background:#fff7f1!important;color:#806d63!important;border-left-color:#e8794d!important}
+.docs-code,.docs-code-block{background:#fff4ec!important;color:#754332!important}
+.model-share i{background:#f4e6de!important}
+.palette-backdrop{background:rgba(77,48,35,.22)!important;backdrop-filter:blur(5px)}
+.command-palette{background:#fff!important;border-color:#efddd2!important}
+.canvas,.canvas#canvas,.workflow-mini{
+ background-color:#fffaf6!important;
+ background-image:radial-gradient(#ead9cf 1px,transparent 1px)!important;
+ border-color:#ead8cd!important
+}
+.canvas-tools{background:#fff!important;border-color:#efddd2!important}
+.canvas-tools .btn,.canvas-tools #connectNodes,.canvas-tools #autoArrangeNodes,.canvas-tools #centerWorkflowCanvas{
+ background:#fff7f1!important;color:#654b3e!important;border-color:#ead6ca!important
+}
+.canvas-tools #connectNodes.primary,.btn.primary{background:linear-gradient(135deg,#e34b35,#f28a35)!important;color:#fff!important;border-color:#e34b35!important}
+#nodeConfigPanel{background:#fff!important;border-color:#efddd2!important}
+#nodeConfigPanel input,#nodeConfigPanel textarea,#nodeConfigPanel select,
+.node-palette-search{background:#fffaf7!important;color:#34251f!important;border-color:#ead8cd!important}
+.n8n-node-library details{background:#fff!important}
+.n8n-node-grid button{background:#fffaf6!important;color:#59443a!important;border-color:#ead8cd!important}
+.n8n-node-grid button:before{background:#fff0e6!important;color:#d64a32!important}
+.canvas#canvas .node,.canvas .node{
+ background:#fff!important;color:#34251f!important;border-color:#e8cfc1!important;
+ box-shadow:0 8px 24px rgba(112,62,38,.10)!important
+}
+.canvas#canvas .node[data-family="trigger"]{background:#f0faf5!important;border-color:#b9dfce!important}
+.canvas#canvas .node[data-family="logic"]{background:#fff8e9!important;border-color:#ead39c!important}
+.canvas#canvas .node[data-family="ai"]{background:#fff0e9!important;border-color:#f0c1ae!important}
+.canvas#canvas .node[data-family="data"]{background:#eff7ff!important;border-color:#bfd7ee!important}
+.canvas#canvas .node[data-family="integration"]{background:#fff5ed!important;border-color:#edc9ad!important}
+.canvas#canvas .node .node-type,.canvas .node .node-type{
+ background:#fff0e6!important;color:#c64a31!important;border-color:#f0cbb8!important
+}
+.canvas .node:after,.canvas#canvas .node:after{background:#fff!important;border-color:#e8794d!important;box-shadow:0 0 0 3px #e8794d22!important}
+.canvas .node-input-port{background:#fff!important;border-color:#e8794d!important}
+.canvas .node.node-selected,.canvas#canvas .node.node-selected{
+ background:#fff1e8!important;border-color:#e34b35!important;box-shadow:0 0 0 3px #e8794d22!important
+}
+.canvas#canvas .workflow-group-frame{background:#fff5ee!important;border-color:#efc7b2!important}
+.canvas#canvas .workflow-group-label,.canvas .workflow-group-label{background:#fff0e6!important;color:#b94730!important;border-color:#efc7b2!important}
+.canvas .node small,.canvas#canvas .node small,.canvas .node p{color:#806d63!important}
+.toast{background:#fff!important;color:#34251f!important;border-color:#efcdbb!important}
+@media(max-width:700px){.sidebar{background:#fff!important}.app.mobile-nav-open:after{background:rgba(77,48,35,.22)!important}}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
