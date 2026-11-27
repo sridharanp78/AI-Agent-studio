@@ -1166,6 +1166,75 @@ html,body,.app,.main,.content,.page,.workspace,.page-content{background:#fffaf6!
 .agent-detail-flow .movable-flow-connectors{z-index:1}
 .agent-detail-flow .agent-detail-step{z-index:2}
 @media(max-width:700px){.template-flow-track .template-flow-node{width:176px;min-height:142px}.agent-detail-flow{gap:34px!important;padding-inline:8px}.agent-detail-step{flex-basis:180px!important;width:180px!important;min-height:150px!important}}
+
+/* Blueprint workspace: prioritize the workflow canvas and reclaim unused horizontal space */
+body:has(#templateFlowTrack) .content,
+body:has(#agentDetailFlow) .content{width:100%!important;max-width:none!important;margin:0!important;padding:16px clamp(14px,2vw,32px) 36px!important;overflow-x:hidden!important}
+body:has(#templateFlowTrack) .sidebar,
+body:has(#agentDetailFlow) .sidebar{width:66px!important;min-width:66px!important;padding-left:7px!important;padding-right:7px!important}
+body:has(#templateFlowTrack) .sidebar .brand,
+body:has(#agentDetailFlow) .sidebar .brand{justify-content:center;padding:4px 0 18px!important}
+body:has(#templateFlowTrack) .sidebar .brand span:not(.logo),
+body:has(#agentDetailFlow) .sidebar .brand span:not(.logo),
+body:has(#templateFlowTrack) .sidebar .nav-label,
+body:has(#agentDetailFlow) .sidebar .nav-label,
+body:has(#templateFlowTrack) .sidebar .nav-text,
+body:has(#agentDetailFlow) .sidebar .nav-text,
+body:has(#templateFlowTrack) .sidebar .workspace,
+body:has(#agentDetailFlow) .sidebar .workspace,
+body:has(#templateFlowTrack) .sidebar .profile>div:not(.avatar),
+body:has(#agentDetailFlow) .sidebar .profile>div:not(.avatar){display:none!important}
+body:has(#templateFlowTrack) .sidebar .nav button,
+body:has(#agentDetailFlow) .sidebar .nav button{justify-content:center!important;padding:11px 4px!important}
+body:has(#templateFlowTrack) .sidebar .profile,
+body:has(#agentDetailFlow) .sidebar .profile{justify-content:center!important}
+body:has(#templateFlowTrack) .page-head,
+body:has(#agentDetailFlow) .page-head{margin-bottom:12px!important;align-items:center!important}
+body:has(#templateFlowTrack) .page-head h1,
+body:has(#agentDetailFlow) .page-head h1{font-size:23px!important}
+body:has(#templateFlowTrack) .template-detail-hero{width:100%!important;max-width:none!important;min-height:96px!important;padding:17px 22px!important;margin:0 0 12px!important;border-radius:12px!important}
+body:has(#templateFlowTrack) .template-detail-hero h2{font-size:23px!important;margin:4px 0!important}
+body:has(#templateFlowTrack) .template-detail-hero p{max-width:1100px!important;margin:4px 0!important;font-size:12px!important}
+body:has(#templateFlowTrack) .template-detail-mark{width:52px!important;height:52px!important;flex:0 0 52px!important;border-radius:15px!important;font-size:25px!important}
+body:has(#templateFlowTrack) .template-flow-panel{width:100%!important;max-width:none!important;padding:17px 20px 14px!important;margin:0 0 13px!important;border-radius:12px!important}
+body:has(#templateFlowTrack) .template-flow-panel h2{font-size:20px!important;margin:4px 0!important}
+body:has(#templateFlowTrack) .template-flow-panel>.panel-sub{margin:2px 0!important}
+body:has(#templateFlowTrack) .template-flow-scroll{width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:visible!important;padding:20px 8px 25px!important;scrollbar-width:thin;scrollbar-color:#e2b49c #fff5ef}
+body:has(#templateFlowTrack) .template-flow-track{display:flex!important;align-items:stretch!important;justify-content:center!important;gap:34px!important;width:max-content!important;min-width:100%!important;padding:12px 8px 15px!important}
+body:has(#templateFlowTrack) .template-flow-node{flex:0 0 210px!important;width:210px!important;min-height:176px!important;padding:15px 14px!important;border-radius:13px!important;box-shadow:0 5px 16px #9b5b2510!important}
+body:has(#templateFlowTrack) .template-flow-node:hover,
+body:has(#templateFlowTrack) .template-flow-node.is-active{transform:translateY(-4px)!important;box-shadow:0 12px 25px #9b5b2520!important}
+body:has(#templateFlowTrack) .template-flow-node-icon{width:42px!important;height:42px!important;font-size:21px!important;margin-bottom:11px!important}
+body:has(#templateFlowTrack) .template-flow-node-kind{font-size:10px!important}
+body:has(#templateFlowTrack) .template-flow-node b{font-size:13px!important;line-height:1.45!important;margin:7px 0!important}
+body:has(#templateFlowTrack) .template-flow-node small{font-size:10px!important;line-height:1.4!important}
+body:has(#templateFlowTrack) .template-flow-link{width:34px!important;flex:0 0 34px!important;align-self:center!important}
+body:has(#templateFlowTrack) .template-flow-legend{padding-top:10px!important;gap:18px!important;font-size:10px!important}
+body:has(#templateFlowTrack) .template-detail-columns{width:100%!important;max-width:none!important;display:grid!important;grid-template-columns:minmax(0,2fr) minmax(260px,.72fr)!important;gap:13px!important;align-items:start!important}
+body:has(#templateFlowTrack) .template-detail-columns>.panel,
+body:has(#templateFlowTrack) .template-detail-side>.panel{padding:16px!important}
+body:has(#templateFlowTrack) .template-explanation-step{padding:13px 8px!important}
+body:has(#templateFlowTrack) .template-detail-side{gap:12px!important}
+body:has(#templateFlowTrack) .template-detail-side h3{font-size:14px!important}
+body:has(#templateFlowTrack) .template-detail-models{grid-template-columns:1fr!important;gap:6px!important}
+body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
+@media(max-width:1100px){
+ body:has(#templateFlowTrack) .template-flow-track{justify-content:flex-start!important}
+ body:has(#templateFlowTrack) .template-detail-columns{grid-template-columns:1fr!important}
+ body:has(#templateFlowTrack) .template-detail-side{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:680px){
+ body:has(#templateFlowTrack) .content{padding:12px 10px 28px!important}
+ body:has(#templateFlowTrack) .template-detail-hero{padding:14px!important}
+ body:has(#templateFlowTrack) .template-detail-hero h2{font-size:19px!important}
+ body:has(#templateFlowTrack) .template-detail-mark{display:none!important}
+ body:has(#templateFlowTrack) .template-flow-panel{padding:13px 11px!important}
+ body:has(#templateFlowTrack) .template-flow-track{gap:26px!important;justify-content:flex-start!important}
+ body:has(#templateFlowTrack) .template-flow-node{flex-basis:195px!important;width:195px!important;min-height:164px!important}
+ body:has(#templateFlowTrack) .template-flow-link{width:26px!important;flex-basis:26px!important}
+ body:has(#templateFlowTrack) .template-detail-side{grid-template-columns:1fr!important}
+ body:has(#templateFlowTrack) .template-flow-legend{gap:9px!important}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
