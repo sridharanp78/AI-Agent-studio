@@ -1584,6 +1584,23 @@ body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
 .canvas#canvas .node .node-ai-output-port[data-connection-type="ai_tool"]{border-color:#d18a50!important}
 .canvas#canvas .node.connection-target-candidate .node-ai-input-port{background:#f4d9c8!important;box-shadow:0 0 0 4px #e6a77a30!important}
 .canvas#canvas .workflow-links path[data-connection-type]{stroke:#9b78b8!important;stroke-width:2.4!important}
+
+/* Agent Store workflow previews follow the shared n8n node language */
+.template-flow-track{gap:0;align-items:center;padding:24px 18px;min-height:190px}
+.template-flow-node{width:148px;min-height:132px;flex:0 0 148px;align-items:center;justify-content:center;text-align:center;padding:13px 10px;border:1px solid #d9dce2;border-top:1px solid #d9dce2;border-radius:10px;background:#fff;box-shadow:0 2px 7px rgba(20,28,42,.07)}
+.template-flow-node.trigger{border-color:#efb3a6}.template-flow-node.logic{border-color:#e7d3a2}.template-flow-node.ai{border-color:#cbb7e6}.template-flow-node.app{border-color:#b8d4e5}.template-flow-node.data{border-color:#b9d9c8}
+.template-flow-node-icon{width:42px;height:42px;border:1px solid #edf0f3;border-radius:10px;background:#fff;margin:0 auto 8px;font-size:22px}
+.template-flow-node-kind{font-size:10px;letter-spacing:.2px;color:#697386;text-transform:none}
+.template-flow-node b{font-size:11px;line-height:1.35;margin:5px 0 3px;max-width:125px}
+.template-flow-node small{font-size:9px;line-height:1.35}
+.template-flow-node:before{left:-7px;width:10px;height:10px;border:2px solid #9aa3b2;background:#fff}
+.template-flow-node:after{right:-7px;width:10px;height:10px;border:2px solid #9aa3b2;background:#fff}
+.template-flow-link{width:66px;flex:0 0 66px;height:2px;background:#aab1bc}
+.template-flow-link:after{border-color:#8993a2}
+.template-flow-link:before{background:#aab1bc}
+.store-agent-actions{display:flex;gap:7px;flex-wrap:wrap}
+.store-agent-actions .btn{font-size:10px;padding:7px 9px}
+@media(max-width:720px){.template-flow-node{width:132px;flex-basis:132px}.template-flow-link{width:38px;flex-basis:38px}}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
