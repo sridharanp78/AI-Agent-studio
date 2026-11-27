@@ -636,6 +636,11 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
  .agent-gallery-main p{min-height:62px;max-height:62px}
  .agent-gallery-footer{min-height:54px}
 }
+
+/* Keep gallery columns balanced at tablet widths */
+@media(min-width:1101px){.agent-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:701px) and (max-width:1100px){.agent-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.agent-gallery-card{min-height:405px}}
+@media(max-width:700px){.agent-category-grid{grid-template-columns:minmax(0,1fr)}}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
