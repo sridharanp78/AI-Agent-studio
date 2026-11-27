@@ -606,6 +606,13 @@ body{background:radial-gradient(ellipse at 78% -20%,#1c1a35 0,transparent 38%),v
 .agent-gallery-list .agent-category-grid{grid-template-columns:1fr}
 @media(max-width:1100px){.agent-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.agent-category-grid{grid-template-columns:1fr}.agent-gallery-card{min-height:320px;padding:16px}.agent-gallery-top{grid-template-columns:94px minmax(0,1fr) 27px;min-height:160px;gap:10px}.agent-flow-logo{width:94px;height:112px}.agent-flow-logo svg{width:54px;height:54px}}
+
+/* Compact flowchart mark inside the taller agent cards */
+.agent-flow-logo{width:76px;height:76px;gap:2px;border-radius:12px}
+.agent-flow-logo svg{width:38px;height:38px}
+.agent-flow-logo span{font-size:8px}
+.agent-gallery-top{grid-template-columns:82px minmax(0,1fr) 30px}
+@media(max-width:700px){.agent-flow-logo{width:66px;height:66px}.agent-flow-logo svg{width:34px;height:34px}.agent-gallery-top{grid-template-columns:72px minmax(0,1fr) 27px}}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
