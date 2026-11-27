@@ -797,6 +797,74 @@ button:focus-visible,[tabindex]:focus-visible{outline-color:#e8794d!important}
 .toast{background:#fff!important;color:#34251f!important;border-color:#efcdbb!important}
 @media(max-width:700px){.sidebar{background:#fff!important}.app.mobile-nav-open:after{background:rgba(77,48,35,.22)!important}}
 
+
+/* Daylight theme: final sweep for legacy dark surfaces */
+:root{color-scheme:light!important;--bg:#fffaf6;--panel:#ffffff;--panel2:#fff2e9;--line:#f0ddd2;--muted:#88766d;--text:#34251f;--surface:#fff;--surface-2:#fff1e8}
+html,body,.app,.main,.content,.page,.workspace,.page-content{background:#fffaf6!important;color:#34251f}
+.sidebar,.topbar,.workspace,.icon-btn,.global-search,.btn,.search,
+.field input,.field textarea,.field select,.chat-compose input,.mode-switch,
+.model-card,.kb-agent,.dropzone,.store-note,.playground-nav-panel,.playground-settings,
+.playground-mode,.playground-main,.playground-chat-header,.chat-stage,.chat-compose-wrap,
+.chat-compose,.prompt-suggestions button,.chat-stage .bubble.assistant,.message-action,
+.chat-compose-meta kbd,.crew-flow span,.timeline-event,.docs-code,.docs-code-block,
+.canvas-tools,.node-palette-search,.n8n-node-library,.n8n-node-library details,
+.n8n-node-grid button,.node-config-basics,#conditionNodeSettings,#toolNodeSettings,
+#agentNodeSettings,#appNodeSettings,.app-node-advanced,.app-node-advanced textarea,
+.command-palette,.store-filter,.store-template-details,.agent-gallery-card{
+ background:#fff!important;color:#45332b!important;border-color:#f0d7c9!important;
+ box-shadow:0 5px 18px rgba(125,73,43,.06)
+}
+.workspace,.playground-main,.playground-nav-panel,.playground-settings,.playground-chat-header,
+.chat-stage,.chat-compose-wrap,.chat-compose,.store-hero,.crew-hero,
+.overview-banner,.docs-hero,.drive-summary,.billing-hero{
+ background:linear-gradient(135deg,#fff 0%,#fff5ed 100%)!important;color:#45332b!important;border-color:#f0d7c9!important
+}
+.sidebar,.topbar{background:rgba(255,255,255,.96)!important;border-color:#f0d7c9!important}
+.search,.global-search,.field input,.field textarea,.field select,.chat-compose input,
+.node-palette-search,.app-node-advanced,.app-node-advanced textarea{
+ background:#fffaf6!important;color:#45332b!important;border-color:#e9cdbd!important
+}
+::placeholder{color:#a18d82!important;opacity:1}
+.store-hero,.crew-hero,.overview-banner,.docs-hero,.drive-summary,.billing-hero,
+.store-note,.provider-runtime-note,.playground-ready,.preview-pill{
+ background:#fff1e8!important;color:#704333!important;border-color:#f2cdb8!important
+}
+.store-hero-mark,.play-agent-avatar{background:#ffe5d5!important;color:#b94a2d!important;border-color:#f3c3aa!important}
+.canvas,.canvas#canvas,.workflow-mini{
+ background-color:#fffaf6!important;
+ background-image:radial-gradient(#ead8cc 1px,transparent 1px)!important;
+ border-color:#ecd7ca!important
+}
+.canvas .node,.canvas#canvas .node{
+ color:#49352b!important;background:#fff!important;border-color:#edcbb8!important;
+ box-shadow:0 8px 22px rgba(116,69,43,.12)!important
+}
+.canvas#canvas .node[data-family="trigger"],.canvas .node[data-kind="trigger"],
+.canvas .node[data-kind="webhook"],.canvas .node[data-kind="schedule-trigger"],
+.canvas .node[data-kind="manual-trigger"]{background:#eaf8ef!important;border-color:#9bd5ad!important;color:#245a39!important}
+.canvas#canvas .node[data-family="logic"],.canvas .node[data-kind="if"],
+.canvas .node[data-kind="switch"],.canvas .node[data-kind="condition"]{background:#fff7df!important;border-color:#edcf79!important;color:#765315!important}
+.canvas#canvas .node[data-family="ai"],.canvas .node[data-kind="ai-agent"],
+.canvas .node[data-kind*="chat-model"],.canvas .node[data-kind="basic-llm-chain"],
+.canvas .node[data-kind="embeddings"]{background:#fff0e7!important;border-color:#f0b18d!important;color:#874322!important}
+.canvas#canvas .node[data-family="data"],.canvas .node[data-kind="postgres"],
+.canvas .canvas .node[data-kind="google-sheets"]{background:#edf5ff!important;border-color:#a9c8ee!important;color:#315b86!important}
+.canvas .node[data-kind="http-request"],.canvas .node[data-kind="gmail"],
+.canvas .node[data-kind="google-drive"],.canvas .node[data-kind="slack"]{background:#fff!important;border-color:#edcbb8!important;color:#49352b!important}
+.canvas .node:after,.canvas .node .node-input-port,.canvas .node .node-output-port{
+ background:#fff!important;box-shadow:0 0 0 3px rgba(226,91,52,.12)!important;border-color:#e56b43!important
+}
+.canvas .node.node-selected,.canvas#canvas .node.node-selected{
+ background:#fff0e7!important;border-color:#e56b43!important;box-shadow:0 0 0 3px rgba(229,107,67,.16)!important
+}
+.canvas .connection,.canvas svg path{stroke:#d98a67}
+.n8n-node-grid button:hover,.playground-mode:hover,.prompt-suggestions button:hover,
+.btn:hover,.icon-btn:hover{background:#fff0e7!important;color:#a83e28!important;border-color:#e9a17e!important}
+.command-palette{background:#fff!important;box-shadow:0 22px 70px rgba(75,43,27,.18)!important}
+.app.mobile-nav-open:after{background:rgba(72,45,32,.24)!important}
+.toast{background:#fff!important;color:#45332b!important;border-color:#edcbb8!important}
+.agent-gallery-card{background:#fff!important}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
