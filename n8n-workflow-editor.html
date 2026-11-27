@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -144,7 +144,7 @@ h5{margin:18px 0 0;font-size:12px;color:var(--mute);font-weight:600}
   <p class="auth-note">Prototype authentication: up to 50 accounts are stored in this browser. Passwords are salted and hashed locally. This is not production-grade security; use server-side authentication before public deployment.</p>
  </form>
 </section>
-<header class="hd" id="hd"><div class="l"><span class="logo">n8n</span><button class="btn" id="bHome" aria-label="Back to workflows">‹ Workflows</button><span class="bc">Personal /</span><input id="wn" class="wni" aria-label="Workflow name"></div>
+<header class="hd" id="hd"><div class="l"><span class="logo">n8n</span><button class="btn" id="bHome" aria-label="Back to workflows">‹ Workflows</button><button class="btn" id="bStudioHome">AI Agent Studio</button><span class="bc">Personal /</span><input id="wn" class="wni" aria-label="Workflow name"></div>
 <nav class="tabs" aria-label="Workflow views"><span class="on">Editor</span><span>Executions</span><span>Evaluations</span></nav>
 <div class="r"><button class="btn pri" id="bAdd2">+ Add node</button><span class="sw"><i></i>Inactive</span><button class="btn" id="bSave">Save</button><button class="btn" id="exportJson">Export JSON</button><button class="btn" id="importJson">Import JSON</button><input id="jsonFile" type="file" accept=".json,application/json" hidden><button class="btn auth-out" id="logoutBtn">Sign out</button><button class="btn" id="bMenu" aria-label="More">⋯</button></div>
 <div class="menu" id="menu" hidden><button id="mNew">Create new workflow</button><button id="mDup">Duplicate this workflow</button><button id="mDel" class="del">Delete this workflow</button><button id="mJson">Download or import JSON…</button><button id="mReset">Replace with the Cold Mail example</button></div></header>
@@ -702,7 +702,7 @@ $("authForm").addEventListener("submit",function(e){
     }).catch(function(){$("authError").textContent="Authentication is unavailable in this browser."});
   }
 });
-if(sessionStorage.getItem("workflowStudio.session"))$("authScreen").hidden=true;
+sessionStorage.setItem("workflowStudio.session",sessionStorage.getItem("workflowStudio.session")||"local-editor");$("authScreen").hidden=true;
 $("logoutBtn").onclick=function(){
   sessionStorage.removeItem("workflowStudio.session");
   $("authPassword").value="";
@@ -731,7 +731,7 @@ function goHome(){if(CUR)save();closeNDV();closeNC();$("md").hidden=true;$("menu
 function createWf(){var e={id:uid(),wf:{name:wfName("My workflow"),nodes:[],connections:{}},updated:Date.now()};DB.list.unshift(e);CUR=e;save();openWf(e.id)}
 function dupWf(id){var o=DB.list.filter(function(x){return x.id===id})[0];if(!o)return;var w=clone(o.wf);w.name=wfName(o.wf.name+" copy");w.nodes.forEach(function(n){n.id=uid()});DB.list.unshift({id:uid(),wf:w,updated:Date.now()});save();if($("home").hidden)goHome();else renderHome()}
 function delWf(id){var o=DB.list.filter(function(x){return x.id===id})[0];if(!o)return;ask("Delete workflow?","“"+o.wf.name+"” and its nodes will be removed. This cannot be undone.","Delete",function(){DB.list=DB.list.filter(function(x){return x.id!==id});if(CUR===o)CUR=null;save();goHome()})}
-$("bHome").onclick=goHome;$("wn").onchange=function(){var v=this.value.trim()||"My workflow";S.name=v;this.value=v;save()};
+$("bHome").onclick=goHome;$("bStudioHome").onclick=function(){location.href="index.html#workflows"};$("wn").onchange=function(){var v=this.value.trim()||"My workflow";S.name=v;this.value=v;save()};
 $("mNew").onclick=function(){$("menu").hidden=true;save();createWf()};$("mDup").onclick=function(){$("menu").hidden=true;dupWf(CUR.id)};$("mDel").onclick=function(){$("menu").hidden=true;delWf(CUR.id)};
 $("empty").onclick=function(){addFrom=null;openNC()};
 function tidyLayout(){
