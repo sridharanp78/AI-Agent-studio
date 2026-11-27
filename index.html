@@ -1012,7 +1012,7 @@ html,body,.app,.main,.content,.page,.workspace,.page-content{background:#fffaf6!
 .canvas .node{overflow:visible;z-index:3;transition:filter .16s,box-shadow .16s,border-radius .16s,clip-path .16s}
 .canvas .node[data-behavior="trigger"]{border-radius:28px 28px 28px 8px;padding-left:20px}
 .canvas .node[data-behavior="logic"]{border-radius:22px 5px 22px 5px;border-width:2px}
-.canvas .node[data-behavior="ai"]{border-radius:18px 5px 18px 5px;clip-path:polygon(0 9%,8% 0,92% 0,100% 9%,100% 91%,92% 100%,8% 100%,0 91%)}
+.canvas .node[data-behavior="ai"]{border-radius:18px 5px 18px 5px;border-style:double;border-width:3px}
 .canvas .node[data-behavior="integration"]{border-radius:7px 18px 7px 18px}
 .canvas .node[data-behavior="transform"]{border-radius:4px 18px 4px 18px;transform:skewX(-1deg)}
 .canvas .node[data-behavior="data"]{border-radius:12px 12px 4px 4px}
@@ -1026,11 +1026,11 @@ html,body,.app,.main,.content,.page,.workspace,.page-content{background:#fffaf6!
 .template-flow-node{position:relative}
 .template-flow-node.trigger{border-radius:28px 28px 28px 8px}
 .template-flow-node.logic{border-radius:22px 5px 22px 5px;border-width:2px}
-.template-flow-node.ai{border-radius:18px 5px 18px 5px;clip-path:polygon(0 9%,8% 0,92% 0,100% 9%,100% 91%,92% 100%,8% 100%,0 91%)}
+.template-flow-node.ai{border-radius:18px 5px 18px 5px;border-style:double;border-width:3px}
 .template-flow-node.app{border-radius:7px 18px 7px 18px}
 .template-flow-node.data{border-radius:12px 12px 4px 4px}
 .template-flow-node:hover{z-index:8;filter:brightness(1.02)}
-@media(max-width:700px){.node-hover-details{width:210px;max-width:68vw}.canvas .node[data-behavior="ai"]{clip-path:none;border-radius:16px 4px 16px 4px}}
+@media(max-width:700px){.node-hover-details{width:210px;max-width:68vw}.canvas .node[data-behavior="ai"]{border-radius:16px 4px 16px 4px}}
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
@@ -1243,7 +1243,7 @@ return head('Industry Agent Store','Choose an industry category first, then expl
 }
 
 
-function attachWorkflowNodeHover(node,type,title,detail){if(!node)return;const kind=String(type||'node').toLowerCase();node.dataset.behavior=/trigger|webhook|schedule/.test(kind)?'trigger':/if|switch|condition|filter|merge|loop/.test(kind)?'logic':/agent|openai|anthropic|gemini|llm|embedding|vector|classifier/.test(kind)?'ai':/gmail|slack|discord|telegram|sheets|drive|http|hubspot|salesforce|notion|github|postgres|mysql|airtable|stripe|shopify|outlook|teams/.test(kind)?'integration':/code|transform|set|edit-fields|aggregate|sort|date|crypto|xml|html|file/.test(kind)?'transform':'data';const tip=document.createElement('div');tip.className='node-hover-details';const head=document.createElement('strong');head.textContent=String(title||type||'Workflow node');const kindLine=document.createElement('span');kindLine.textContent=String(type||'Node')+' · '+node.dataset.behavior;const body=document.createElement('p');body.textContent=String(detail||'Select this node to configure its behavior and inputs.');const foot=document.createElement('small');foot.textContent='Click node to open settings';tip.append(head,kindLine,body,foot);node.appendChild(tip);node.title=String(title||type||'Workflow node')+' — '+String(detail||'Select to configure');}
+function attachWorkflowNodeHover(node,type,title,detail){if(!node)return;const kind=String(type||'node').toLowerCase();node.dataset.behavior=/trigger|webhook|schedule/.test(kind)?'trigger':/if|switch|condition|filter|merge|loop/.test(kind)?'logic':/agent|openai|anthropic|gemini|llm|embedding|vector|classifier/.test(kind)?'ai':/gmail|slack|discord|telegram|sheets|drive|http|hubspot|salesforce|notion|github|postgres|mysql|airtable|stripe|shopify|outlook|teams/.test(kind)?'integration':/code|transform|set|edit-fields|aggregate|sort|date|crypto|xml|html|file/.test(kind)?'transform':'data';const tip=document.createElement('div');tip.className='node-hover-details';const head=document.createElement('strong');head.textContent=String(title||type||'Workflow node');const kindLine=document.createElement('span');kindLine.textContent=String(type||'Node')+' · '+node.dataset.behavior;const body=document.createElement('p');body.textContent=String(detail||'Select this node to configure its behavior and inputs.');const foot=document.createElement('small');foot.textContent='Click node to open settings';tip.append(head,kindLine,body,foot);node.appendChild(tip);const refreshTip=()=>{const currentTitle=node.querySelector('b')?.textContent||title||type||'Workflow node',currentType=node.querySelector('.node-type')?.textContent||type||'Node',currentDetail=node.querySelector('small')?.textContent||detail||'Select to configure';head.textContent=currentTitle;kindLine.textContent=currentType+' · '+node.dataset.behavior;body.textContent=currentDetail;node.title=currentTitle+' — '+currentDetail};node.addEventListener('mouseenter',refreshTip);refreshTip();}
 let activeStoreTemplateKey='';
 function storeTemplateDetailPage(){
  const t=INDUSTRY_TEMPLATE_LOOKUP[activeStoreTemplateKey];
