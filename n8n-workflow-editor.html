@@ -128,6 +128,23 @@ h5{margin:18px 0 0;font-size:12px;color:var(--mute);font-weight:600}
 .auth-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin-bottom:22px}.auth-brand .logo{font-size:16px;padding:5px 9px}
 .auth-card h1{font-size:25px;margin:0 0 6px}.auth-card p{color:var(--mute);margin:0 0 18px}.auth-card label{margin-top:13px}.auth-card .btn{width:100%;margin-top:18px;padding:10px}.auth-switch{text-align:center;margin-top:14px;font-size:13px;color:var(--mute)}.auth-switch button{border:0;background:none;color:var(--pri);font-weight:700}.auth-note{font-size:11px!important;line-height:1.5;margin-top:16px!important}.auth-error{color:var(--bad);font-size:12px;min-height:18px;margin-top:8px}
 .auth-out{font-size:12px}
+
+/* n8n-style canvas refinements */
+.nw{width:104px;height:104px}
+.n{border-width:1.5px;border-radius:9px;background:#fff;box-shadow:0 1px 2px rgba(25,32,48,.06)}
+.n.trg{border-radius:52px 10px 10px 52px}
+.n svg{width:42px;height:42px}
+.pin:after{width:10px;height:10px;background:#fff;border:2px solid #9298a5}
+.pin:hover:after,.pin.on:after{border-color:var(--pri);background:var(--pri)}
+svg.w path.e{stroke:#9298a5;stroke-width:2.2}
+svg.w path.e.run{stroke:#2cb67d;stroke-width:2.6}
+svg.w path.e.sel{stroke:#ff6d5a;stroke-width:3}
+svg.w path.hit{stroke-width:18}
+.cap{width:170px;left:auto;transform:translateX(-33px);text-align:center}
+.cap b{font-size:13px;font-weight:600;color:#303440}
+.cap span{display:block;margin-top:3px;font-size:11px;color:#858b99}
+.nw:hover .n,.nw.sel .n{box-shadow:0 0 0 2px rgba(255,109,90,.12);border-color:#ff6d5a}
+
 </style>
 </head>
 <body>
@@ -166,8 +183,8 @@ window.onerror=function(m,u,l){var d=document.createElement("div");d.style.cssTe
 var SEED={"name": "Cold Mail", "nodes": [{"id": "e5f32961-c7e2-4d6e-9d35-5604597dbfbc", "name": "When clicking ‘Execute workflow’", "type": "n8n-nodes-base.manualTrigger", "typeVersion": 1, "position": [80, 16], "parameters": {}}, {"id": "2f3de88d-a9d7-4bd9-b704-6aa2b848ca02", "name": "Get row(s) in sheet", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.7, "position": [240, 0], "parameters": {"documentId": {"__rl": true, "value": "YOUR_SHEET_ID", "mode": "list", "cachedResultName": "Lead Sheet", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"}, "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "Sheet1", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"}, "options": {}}}, {"id": "cf15f2e6-5977-44e0-98d7-dd154ec521c2", "name": "If", "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [416, -16], "parameters": {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"id": "fbdbd708-32e7-4460-9097-672dc8dda47d", "leftValue": "={{ $json['Sent Status'] }}", "rightValue": "SENT", "operator": {"type": "string", "operation": "equals"}}], "combinator": "and"}, "options": {}}}, {"id": "b5f0ecad-7112-442a-ae83-e7085e3e7433", "name": "Loop Over Items", "type": "n8n-nodes-base.splitInBatches", "typeVersion": 3, "position": [608, 0], "parameters": {"options": {}}}, {"id": "c83c965d-24dd-4366-a48a-2828291c44e7", "name": "Get row(s) in sheet1", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.7, "position": [752, -192], "parameters": {"documentId": {"__rl": true, "value": "YOUR_SHEET_ID", "mode": "list", "cachedResultName": "Lead Sheet", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"}, "sheetName": {"__rl": true, "value": 1554978092, "mode": "list", "cachedResultName": "Sheet2", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=1554978092"}, "options": {}}}, {"id": "531ef533-38b5-4be3-8e27-8df4529d21fc", "name": "Code", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [944, -208], "parameters": {"jsCode": "// Get templates from previous node\nconst templates = items.map(item => item.json);\n\n// Check if templates exist\nif (!templates || templates.length === 0) {\n  throw new Error('No templates found');\n}\n\n// Pick a random template\nconst index = Math.floor(Math.random() * templates.length);\nconst template = templates[index];\n\n// Convert body to HTML\nconst bodyHtml = template.Body.replace(/\\n/g, '<br>');\n\n// Return in n8n-compatible format\nreturn [\n  {\n    json: {\n      subject: template.Subject,\n      body: bodyHtml\n    }\n  }\n];"}}, {"id": "022296f9-76b4-49b4-bab3-ffec9137b407", "name": "Merge", "type": "n8n-nodes-base.merge", "typeVersion": 3.2, "position": [1136, -128], "parameters": {"mode": "combine", "combineBy": "combineByPosition", "options": {}}}, {"id": "212ae803-d982-44ee-8d5a-d300eabcd22d", "name": "Edit Fields", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [1296, -224], "parameters": {"assignments": {"assignments": [{"id": "5a8d5f5d-ff41-45fe-bdb9-a0a6de4878e1", "name": "body", "value": "={{ $json.body.replace(\"[name]\", $json[\"Name\"] && $json[\"Name\"].trim() !== '' ? $json[\"Name\"].trim() : \"there\") }}", "type": "string"}]}, "includeOtherFields": true, "options": {}}}, {"id": "068f8df8-7307-48d4-87b7-4376c11a1b59", "name": "Send a message", "type": "n8n-nodes-base.gmail", "typeVersion": 2.1, "position": [1472, -32], "parameters": {"sendTo": "={{ $json.Email }}", "subject": "={{ $json.subject }}", "message": "={{ $json.body }}", "options": {"appendAttribution": false, "senderName": "Rohit bhau"}}}, {"id": "aadaed57-1391-418a-86a4-b07919d6dadf", "name": "Merge1", "type": "n8n-nodes-base.merge", "typeVersion": 3.2, "position": [1600, -256], "parameters": {"mode": "combine", "combineBy": "combineByPosition", "options": {}}}, {"id": "09c156d3-4037-4b0e-8985-c3d99b82e2eb", "name": "Update row in sheet", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.7, "position": [1776, -256], "parameters": {"operation": "update", "documentId": {"__rl": true, "value": "YOUR_SHEET_ID", "mode": "list", "cachedResultName": "Lead Sheet", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"}, "sheetName": {"__rl": true, "value": "gid=0", "mode": "list", "cachedResultName": "Sheet1", "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"}, "columns": {"mappingMode": "defineBelow", "value": {"Email": "={{ $json.Email }}", "Sent Status": "={{ $json.labelIds[0] }}", "Time": "={{ new Date().toLocaleTimeString(\"en-GB\", { timeZone: \"Asia/Kolkata\", hour12: false }) }}"}, "matchingColumns": ["Email"], "schema": [{"id": "Name", "displayName": "Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": true}, {"id": "Email", "displayName": "Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}, {"id": "Sent Status", "displayName": "Sent Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}, {"id": "Time", "displayName": "Time", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}, {"id": "row_number", "displayName": "row_number", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true, "readOnly": true, "removed": true}], "attemptToConvertTypes": false, "convertFieldsToString": false}, "options": {}}}, {"id": "e5377010-3e07-42ba-a4ba-3fbcc20e640b", "name": "Wait", "type": "n8n-nodes-base.wait", "typeVersion": 1.1, "position": [1664, 0], "parameters": {}}], "connections": {"When clicking ‘Execute workflow’": {"main": [[{"node": "Get row(s) in sheet", "type": "main", "index": 0}]]}, "Get row(s) in sheet": {"main": [[{"node": "If", "type": "main", "index": 0}]]}, "If": {"main": [[], [{"node": "Loop Over Items", "type": "main", "index": 0}]]}, "Loop Over Items": {"main": [[], [{"node": "Get row(s) in sheet1", "type": "main", "index": 0}, {"node": "Merge", "type": "main", "index": 1}]]}, "Get row(s) in sheet1": {"main": [[{"node": "Code", "type": "main", "index": 0}]]}, "Code": {"main": [[{"node": "Merge", "type": "main", "index": 0}]]}, "Merge": {"main": [[{"node": "Edit Fields", "type": "main", "index": 0}]]}, "Edit Fields": {"main": [[{"node": "Send a message", "type": "main", "index": 0}, {"node": "Merge1", "type": "main", "index": 0}]]}, "Send a message": {"main": [[{"node": "Merge1", "type": "main", "index": 1}, {"node": "Wait", "type": "main", "index": 0}]]}, "Merge1": {"main": [[{"node": "Update row in sheet", "type": "main", "index": 0}]]}, "Wait": {"main": [[{"node": "Loop Over Items", "type": "main", "index": 0}]]}}};
 var P="n8n-nodes-base.";
 var CATS=[
-["Triggers","#ff6d5a",["manualTrigger|Manual Trigger|☝|Runs the flow when you click Execute workflow|t","scheduleTrigger|Schedule Trigger|◷|Runs the flow every day, hour or custom interval|t","webhook|Webhook|⇢|Runs the flow when a URL is called|t","formTrigger|n8n Form Trigger|▤|Generate a web form and run the flow on submit|t","errorTrigger|Error Trigger|!|Runs when another workflow fails|t","executeWorkflowTrigger|When Executed by Another Workflow|↳|Runs when called by an Execute Workflow node|t","emailReadImap|Email Trigger (IMAP)|@|Runs when a new email arrives|t","gmailTrigger|Gmail Trigger|G|Runs when an email arrives in Gmail|t","googleSheetsTrigger|Google Sheets Trigger|S|Runs when a row is added or updated|t","googleCalendarTrigger|Google Calendar Trigger|C|Runs on calendar events|t","googleDriveTrigger|Google Drive Trigger|D|Runs when files change in Drive|t","slackTrigger|Slack Trigger|#|Runs on Slack events|t","telegramTrigger|Telegram Trigger|T|Runs on Telegram updates|t","githubTrigger|GitHub Trigger|⌥|Runs on GitHub events|t","stripeTrigger|Stripe Trigger|$|Runs on Stripe events|t","typeformTrigger|Typeform Trigger|T|Runs when a form is submitted|t","calendlyTrigger|Calendly Trigger|C|Runs on Calendly events|t","airtableTrigger|Airtable Trigger|A|Runs when records change|t","notionTrigger|Notion Trigger|N|Runs when pages change|t","hubspotTrigger|HubSpot Trigger|H|Runs on HubSpot events|t","shopifyTrigger|Shopify Trigger|S|Runs on Shopify events|t","jiraTrigger|Jira Trigger|J|Runs on Jira events|t","postgresTrigger|Postgres Trigger|P|Runs on database changes|t","rssFeedReadTrigger|RSS Feed Trigger|⌁|Runs when a feed has new items|t","localFileTrigger|Local File Trigger|▢|Runs when files change on disk|t"]],
-["Flow","#7a8bd6",["if|If|⑂|Route items down true or false|o=true,false","switch|Switch|⇶|Route items to different branches","filter|Filter|▽|Remove items that do not match conditions","merge|Merge|⇉|Combine data from two inputs|i=2","splitInBatches|Loop Over Items (Split in Batches)|↻|Process items in batches|o=done,loop","wait|Wait|◷|Wait before continuing","noOp|No Operation, do nothing|→|Use it as a placeholder","stopAndError|Stop and Error|✕|Throw an error in the workflow","executeWorkflow|Execute Workflow|▷|Run another workflow","respondToWebhook|Respond to Webhook|↩|Return data to a webhook caller","compareDatasets|Compare Datasets|⇄|Compare two inputs for changes|i=2;o=in A only,same,different,in B only"]],
+["Triggers","#ff6d5a",["manualTrigger|Manual Trigger|☝|Runs the flow when you click Execute workflow|t","scheduleTrigger|Schedule Trigger|◷|Runs the flow every day, hour or custom interval|t","webhook|Webhook|⇢|Runs the flow when a URL is called|t","formTrigger|n8n Form Trigger|▤|Generate a web form and run the flow on submit|t","errorTrigger|Error Trigger|!|Runs when another workflow fails|t","executeWorkflowTrigger|When Executed by Another Workflow|↳|Starts when called by an Execute Sub-workflow node|t","emailReadImap|Email Trigger (IMAP)|@|Runs when a new email arrives|t","gmailTrigger|Gmail Trigger|G|Runs when an email arrives in Gmail|t","googleSheetsTrigger|Google Sheets Trigger|S|Runs when a row is added or updated|t","googleCalendarTrigger|Google Calendar Trigger|C|Runs on calendar events|t","googleDriveTrigger|Google Drive Trigger|D|Runs when files change in Drive|t","slackTrigger|Slack Trigger|#|Runs on Slack events|t","telegramTrigger|Telegram Trigger|T|Runs on Telegram updates|t","githubTrigger|GitHub Trigger|⌥|Runs on GitHub events|t","stripeTrigger|Stripe Trigger|$|Runs on Stripe events|t","typeformTrigger|Typeform Trigger|T|Runs when a form is submitted|t","calendlyTrigger|Calendly Trigger|C|Runs on Calendly events|t","airtableTrigger|Airtable Trigger|A|Runs when records change|t","notionTrigger|Notion Trigger|N|Runs when pages change|t","hubspotTrigger|HubSpot Trigger|H|Runs on HubSpot events|t","shopifyTrigger|Shopify Trigger|S|Runs on Shopify events|t","jiraTrigger|Jira Trigger|J|Runs on Jira events|t","postgresTrigger|Postgres Trigger|P|Runs on database changes|t","rssFeedReadTrigger|RSS Feed Trigger|⌁|Runs when a feed has new items|t","localFileTrigger|Local File Trigger|▢|Runs when files change on disk|t"]],
+["Flow","#7a8bd6",["if|If|⑂|Route items down true or false|o=true,false","switch|Switch|⇶|Route items to different branches","filter|Filter|▽|Remove items that do not match conditions","merge|Merge|⇉|Combine data from two inputs|i=2","splitInBatches|Loop Over Items (Split in Batches)|↻|Process items in batches|o=done,loop","wait|Wait|◷|Wait before continuing","noOp|No Operation, do nothing|→|Use it as a placeholder","stopAndError|Stop and Error|✕|Throw an error in the workflow","executeWorkflow|Execute Sub-workflow|▷|Run another workflow as a reusable sub-workflow","respondToWebhook|Respond to Webhook|↩|Return data to a webhook caller","compareDatasets|Compare Datasets|⇄|Compare two inputs for changes|i=2;o=in A only,same,different,in B only"]],
 ["Data transformation","#9b6bff",["set|Edit Fields (Set)|✎|Modify, add or remove item fields","code|Code|{ }|Run custom JavaScript or Python code|c=#ff6d5a","splitOut|Split Out|⇥|Turn a list inside one item into separate items","aggregate|Aggregate|⇤|Combine items into one","sort|Sort|⇅|Change the order of items","limit|Limit|⊟|Restrict the number of items","removeDuplicates|Remove Duplicates|⧉|Delete items with matching field values","summarize|Summarize|Σ|Sum, count, max and more across items","renameKeys|Rename Keys|⌘|Rename fields","dateTime|Date & Time|◔|Work with dates and times","crypto|Crypto|⚿|Hash, HMAC, sign or generate","html|HTML|<>|Work with HTML","xml|XML|‹/›|Convert between JSON and XML","markdown|Markdown|M|Convert between Markdown and HTML","convertToFile|Convert to File|⇩|Convert JSON data to a file","extractFromFile|Extract From File|⇧|Extract data from a file","editImage|Edit Image|▨|Edit and compose images","compression|Compression|⬓|Compress or decompress files","jwt|JWT|J|Decode, sign or verify tokens"]],
 ["Core","#4b6bff",["httpRequest|HTTP Request|↔|Make an HTTP request and return the response","graphql|GraphQL|◇|Make a GraphQL request","emailSend|Send Email|✉|Send an email using SMTP","ftp|FTP|F|Transfer files via FTP or SFTP","ssh|SSH|>|Execute commands over SSH","executeCommand|Execute Command|$_|Run a command on the host","readWriteFile|Read/Write Files from Disk|▭|Read or write files on disk","rssFeedRead|RSS Read|⌁|Read items from an RSS feed"]],
 ["Communication","#3b82f6",["gmail|Gmail|✉|Send, read and label emails","slack|Slack|#|Post messages and manage channels","telegram|Telegram|T|Send messages and files","discord|Discord|D|Send messages to channels","whatsApp|WhatsApp Business Cloud|W|Send WhatsApp messages","twilio|Twilio|T|Send SMS and make calls","microsoftOutlook|Microsoft Outlook|O|Mail, calendar and contacts","microsoftTeams|Microsoft Teams|T|Channels and chats","mattermost|Mattermost|M|Post messages","zoom|Zoom|Z|Manage meetings","sendGrid|SendGrid|S|Send email and manage contacts","mailchimp|Mailchimp|M|Members and campaigns"]],
@@ -175,6 +192,90 @@ var CATS=[
 ["Development and data","#334155",["github|GitHub|⌥|Issues, repos and files","gitlab|GitLab|GL|Issues, repos and files","postgres|Postgres|PG|Query a Postgres database","mySql|MySQL|My|Query a MySQL database","mongoDb|MongoDB|Mo|Query a MongoDB database","redis|Redis|R|Get and set keys","supabase|Supabase|Su|Rows in a Supabase table","awsS3|AWS S3|S3|Buckets, files and folders"]],
 ["Sales and marketing","#f59e0b",["hubspot|HubSpot|H|Contacts, companies and deals","salesforce|Salesforce|SF|Leads, contacts and accounts","pipedrive|Pipedrive|P|Deals, people and organizations","stripe|Stripe|$|Customers and charges","shopify|Shopify|S|Orders and products","wooCommerce|WooCommerce|W|Products and orders","webflow|Webflow|W|Collection items","wordpress|WordPress|W|Posts and users"]],
 ["AI","#10a37f",["@n8n/n8n-nodes-langchain.openAi|OpenAI|AI|Chat, images, audio and files"]]
+,["AI Agents and LangChain","#10a37f",[
+"@n8n/n8n-nodes-langchain.agent|AI Agent|AI|Use an AI agent with connected tools",
+"@n8n/n8n-nodes-langchain.chainLlm|Basic LLM Chain|LLM|Run a language model chain",
+"@n8n/n8n-nodes-langchain.lmChatOpenAi|OpenAI Chat Model|AI|Connect an OpenAI chat model",
+"@n8n/n8n-nodes-langchain.lmChatAnthropic|Anthropic Chat Model|A|Connect an Anthropic chat model",
+"@n8n/n8n-nodes-langchain.lmChatGoogleGemini|Google Gemini Chat Model|G|Connect a Gemini chat model",
+"@n8n/n8n-nodes-langchain.lmChatOllama|Ollama Chat Model|O|Connect a local Ollama model",
+"@n8n/n8n-nodes-langchain.memoryBufferWindow|Window Buffer Memory|M|Keep recent conversation context",
+"@n8n/n8n-nodes-langchain.memoryPostgresChat|Postgres Chat Memory|PG|Persist chat history in Postgres",
+"@n8n/n8n-nodes-langchain.toolCalculator|Calculator Tool|＋|Give an agent a calculator tool",
+"@n8n/n8n-nodes-langchain.toolHttpRequest|HTTP Request Tool|↔|Let an agent call an HTTP endpoint",
+"@n8n/n8n-nodes-langchain.embeddingsOpenAi|OpenAI Embeddings|E|Create vector embeddings",
+"@n8n/n8n-nodes-langchain.vectorStoreInMemory|In-Memory Vector Store|V|Store vectors for retrieval",
+"@n8n/n8n-nodes-langchain.vectorStorePinecone|Pinecone Vector Store|P|Store and search vectors in Pinecone",
+"@n8n/n8n-nodes-langchain.vectorStoreSupabase|Supabase Vector Store|S|Store and search vectors in Supabase",
+"@n8n/n8n-nodes-langchain.retrieverVectorStore|Vector Store Retriever|R|Retrieve relevant documents",
+"@n8n/n8n-nodes-langchain.documentDefaultDataLoader|Default Data Loader|D|Load documents for a vector store",
+"@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter|Recursive Character Text Splitter|T|Split documents into chunks",
+"@n8n/n8n-nodes-langchain.outputParserStructured|Structured Output Parser|{}|Parse structured model output"
+]],
+["Cloud and DevOps","#64748b",[
+"awsLambda|AWS Lambda|λ|Invoke a Lambda function",
+"awsS3|AWS S3|S3|Manage objects in an S3 bucket",
+"awsDynamoDb|AWS DynamoDB|DB|Read and write DynamoDB items",
+"googleCloudStorage|Google Cloud Storage|GCS|Manage cloud storage objects",
+"azureStorage|Azure Storage|AZ|Manage Azure storage",
+"docker|Docker|D|Manage Docker resources",
+"kubernetes|Kubernetes|K8|Work with Kubernetes resources",
+"gitlab|GitLab|GL|Manage projects and pipelines",
+"bitbucket|Bitbucket|B|Manage repositories and pull requests",
+"jenkins|Jenkins|J|Trigger and inspect builds",
+"pagerDuty|PagerDuty|PD|Manage incidents and alerts",
+"datadog|Datadog|DD|Send events and metrics",
+"sentry|Sentry|S|Manage error events"
+]],
+["More databases and analytics","#0f766e",[
+"mariaDb|MariaDB|M|Query a MariaDB database",
+"microsoftSql|Microsoft SQL|SQL|Run SQL Server queries",
+"oracleDatabase|Oracle Database|O|Run Oracle SQL queries",
+"elasticSearch|Elasticsearch|ES|Search and index documents",
+"redis|Redis|R|Read and write cache keys",
+"qdrant|Qdrant|Q|Search vector collections",
+"weaviate|Weaviate|W|Search vector collections",
+"pinecone|Pinecone|P|Manage vector indexes",
+"bigQuery|Google BigQuery|BQ|Run analytical queries",
+"snowflake|Snowflake|SF|Run Snowflake SQL",
+"clickHouse|ClickHouse|CH|Run ClickHouse queries",
+"supabase|Supabase|Su|Manage database records"
+]],
+["CRM and commerce","#d97706",[
+"zohoCrm|Zoho CRM|Z|Manage leads and contacts",
+"freshdesk|Freshdesk|F|Manage customer support tickets",
+"zendesk|Zendesk|Z|Manage support tickets",
+"intercom|Intercom|I|Manage customer conversations",
+"quickbooks|QuickBooks|QB|Manage accounting records",
+"chargebee|Chargebee|C|Manage subscriptions",
+"gumroad|Gumroad|G|Manage products and sales",
+"woocommerce|WooCommerce|W|Manage store products and orders",
+"magento|Magento 2|M|Manage commerce data",
+"mondayCom|monday.com|M|Manage boards and items",
+"salesforce|Salesforce|SF|Manage CRM records"
+]],
+["Files and content","#8b5cf6",[
+"readBinaryFiles|Read Binary Files|⇧|Read binary files",
+"writeBinaryFile|Write Binary File|⇩|Write binary files",
+"extractFromCsv|Extract from CSV|CSV|Parse CSV data",
+"spreadsheetFile|Spreadsheet File|XLS|Read and write spreadsheet files",
+" sftp|SFTP|S|Transfer files securely",
+"googleSlides|Google Slides|G|Create and update presentations",
+"microsoftWord|Microsoft Word 365|W|Create and update documents",
+"youtube|YouTube|▶|Manage YouTube videos and playlists",
+"wordpress|WordPress|W|Manage posts and media",
+"strapi|Strapi|S|Manage CMS content"
+]],
+["Utilities and security","#475569",[
+"crypto|Crypto|⚿|Hash and encrypt data",
+"ldap|LDAP|L|Search directory entries",
+"totp|TOTP|2FA|Generate or verify one-time passwords",
+"compareDatasets|Compare Datasets|⇄|Compare two datasets",
+"itemLists|Item Lists|☷|Aggregate and split list data",
+"noOp|No Operation|→|Pass data through unchanged",
+"stopAndError|Stop and Error|✕|Stop execution with a custom error"
+]]
+
 ];
 var VER={if:2.2,merge:3.2,set:3.4,splitInBatches:3,code:2,wait:1.1,httpRequest:4.2,googleSheets:4.7,gmail:2.1,scheduleTrigger:1.2,webhook:2,filter:2.2,switch:3.2,removeDuplicates:2,summarize:1.1,dateTime:2,slack:2.3,discord:2,notion:2.2,airtable:2.1,googleDrive:3,googleCalendar:1.3,openAi:1.8,postgres:2.5,respondToWebhook:1.2,executeWorkflow:1.1,emailSend:2.1,telegram:1.2,formTrigger:2.2,executeWorkflowTrigger:1.1,mySql:2.4,mongoDb:1.2,hubspot:2,microsoftOutlook:2,microsoftTeams:2,microsoftExcel:2.2,googleDocs:2};
 var ICN={
@@ -408,9 +509,16 @@ function addNode(type){
 function el(c,h,x,y){var d=document.createElement("div");d.className=c;d.innerHTML=h;d.style.left=x+"px";d.style.top=y+"px";st.appendChild(d);return d}
 function mk(t){return document.createElementNS("http://www.w3.org/2000/svg",t)}
 function back(o,i){return i[0]-6<o[0]+15}
-function edgeD(o,i){var x1=o[0]+5,x2=i[0]-6;
- if(back(o,i)){var yy=Math.max(o[1],i[1])+140,a=x1+26,b=x2-26;return"M"+x1+","+o[1]+" L"+a+","+o[1]+" L"+a+","+yy+" L"+b+","+yy+" L"+b+","+i[1]+" L"+x2+","+i[1]}
- var m=Math.max(30,(x2-x1)/2);return"M"+x1+","+o[1]+" C"+(x1+m)+","+o[1]+" "+(x2-m)+","+i[1]+" "+x2+","+i[1]}
+function edgeD(o,i){
+ var x1=o[0]+5,x2=i[0]-6,dx=x2-x1;
+ if(back(o,i)){
+  var lane=Math.max(o[1],i[1])+112+Math.min(4,Math.abs(dx)/180)*18;
+  var c1=x1+Math.max(42,Math.min(120,Math.abs(dx)*.45)),c2=x2-Math.max(42,Math.min(120,Math.abs(dx)*.45));
+  return "M"+x1+","+o[1]+" C"+c1+","+o[1]+" "+c1+","+lane+" "+((x1+x2)/2)+","+lane+" C"+c2+","+lane+" "+c2+","+i[1]+" "+x2+","+i[1];
+ }
+ var bend=Math.max(42,Math.min(180,Math.abs(dx)*.5));
+ return "M"+x1+","+o[1]+" C"+(x1+bend)+","+o[1]+" "+(x2-bend)+","+i[1]+" "+x2+","+i[1]
+}
 function mid(o,i){return back(o,i)?[(o[0]+i[0])/2,Math.max(o[1],i[1])+140]:[(o[0]+i[0])/2,(o[1]+i[1])/2]}
 function nstate(name){var r=RES[name];if(!r||!vis[name]||r.skip)return"";return r.err?"err":"ran"}
 function draw(){$("empty").hidden=S.nodes.length>0;
@@ -708,7 +816,20 @@ $("logoutBtn").onclick=function(){
   $("authPassword").value="";
   $("authScreen").hidden=false;
   setAuthMode("login");
-};
+}
+;
+Object.assign(ICN,{
+agent:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="#10a37f" stroke-width="2"/><path d="M4 20c.8-4 3.4-6 8-6s7.2 2 8 6M9 8h.1M15 8h.1" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round"/></svg>',
+chainLlm:'<svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5" fill="none" stroke="#10a37f" stroke-width="1.8" stroke-linecap="round"/></svg>',
+lmChatOpenAi:'<svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 1 3.5 2.1 4 4 0 0 1 4.2 5.8 4 4 0 0 1-1.1 6.8A4 4 0 0 1 12 21a4 4 0 0 1-3.5-2.1 4 4 0 0 1-4.2-5.8 4 4 0 0 1 1.1-6.8A4 4 0 0 1 12 3z" fill="none" stroke="#10a37f" stroke-width="1.6"/></svg>',
+memoryBufferWindow:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="#8b5cf6" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round"/></svg>',
+toolCalculator:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#10a37f" stroke-width="1.8"/><path d="M8 7h8M8 12h2m4 0h2M8 16h2m4 0h2" stroke="#10a37f" stroke-width="1.8" stroke-linecap="round"/></svg>',
+toolHttpRequest:'<svg viewBox="0 0 24 24"><path d="M4 8h13m-4-4 4 4-4 4M20 16H7m4-4-4 4 4 4" fill="none" stroke="#10a37f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+vectorStoreInMemory:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="#10a37f" stroke-width="1.7"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" fill="none" stroke="#10a37f" stroke-width="1.7"/></svg>',
+executeWorkflow:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="#7a8bd6" stroke-width="1.8"/><path d="m10 8 6 4-6 4z" fill="#7a8bd6"/></svg>',
+executeWorkflowTrigger:'<svg viewBox="0 0 24 24"><path d="M4 12h5m0 0-3-3m3 3-3 3M11 5h8v14h-8" fill="none" stroke="#ff6d5a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+});
+;
 $("bAdd2").onclick=function(){addFrom=null;openNC()};$("ncc").textContent="· "+Object.keys(CAT).length+" nodes";
 
 function ask(t,m,ok,cb){$("cft").textContent=t;$("cfm").textContent=m;$("cfy").textContent=ok;$("cf").hidden=false;$("cfy").onclick=function(){$("cf").hidden=true;cb()};$("cfn").onclick=function(){$("cf").hidden=true}}
