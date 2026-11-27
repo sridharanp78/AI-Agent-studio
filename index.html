@@ -1448,6 +1448,41 @@ body:has(#templateFlowTrack) .template-detail-model{padding:9px 10px!important}
  .template-flow-node-icon,.agent-detail-flow .agent-detail-step-icon{width:66px!important;height:66px!important}
  .template-flow-link{flex-basis:22px!important;width:22px!important}
 }
+
+/* Compact n8n-like workflow refinement: readable node cards, ports and daylight canvas */
+.canvas#canvas,.canvas{min-height:680px!important;height:calc(100vh - 210px)!important;max-height:980px!important;background-color:#fffdfb!important;background-image:radial-gradient(circle,#dfd1c8 1px,transparent 1.15px)!important;background-size:22px 22px!important;border:1px solid #eadbd2!important;border-radius:10px!important;box-shadow:inset 0 1px 0 #fff!important}
+.canvas .node{width:190px!important;min-height:94px!important;height:auto!important;padding:12px 13px 11px 15px!important;border:1px solid #e6d9d1!important;border-radius:8px!important;background:#fff!important;color:#352720!important;box-shadow:0 2px 7px #5b34200d,0 7px 18px #5b34200a!important}
+.canvas .node:hover,.canvas .node.node-selected{border-color:#e27c50!important;box-shadow:0 0 0 2px #e27c5022,0 8px 22px #6d392016!important}
+.canvas .node b,.canvas .node strong{color:#352720!important;font-size:12px!important;font-weight:650!important}
+.canvas .node small,.canvas .node .node-description{color:#88766d!important;font-size:10px!important}
+.canvas .node .node-type{font-size:8px!important;margin-bottom:7px!important;padding:3px 6px!important}
+.canvas .node:before{left:-1px!important;top:9px!important;bottom:9px!important;width:3px!important;border-radius:0 3px 3px 0!important}
+.canvas .node:after{right:-7px!important;width:10px!important;height:10px!important;border:2px solid #d77b52!important;background:#fff!important;box-shadow:0 0 0 3px #d77b5218!important}
+.canvas .node[data-behavior="trigger"]{border-radius:18px 18px 18px 6px!important}
+.canvas .node[data-behavior="logic"]{border-radius:12px 3px 12px 3px!important}
+.canvas .node[data-behavior="ai"]{border:2px double #b78acb!important;border-radius:12px 4px 12px 4px!important}
+.canvas .node[data-behavior="integration"]{border-radius:5px 12px 5px 12px!important}
+.canvas .node[data-behavior="transform"]{border-radius:4px 12px 4px 12px!important}
+.canvas .node[data-behavior="data"]{border-radius:8px 8px 3px 3px!important}
+.canvas .workflow-links path{filter:none!important}
+.template-flow-panel{background:#fff!important}
+.app.blueprint-focus .template-flow-scroll{min-height:470px!important;height:min(62vh,700px)!important;max-height:720px!important;overflow:auto!important;padding:42px 28px!important;background-color:#fffdfb!important;background-image:radial-gradient(circle,#dfd1c8 1px,transparent 1.15px)!important;background-size:22px 22px!important;border:1px solid #eadbd2!important;border-radius:10px!important}
+.app.blueprint-focus .template-flow-track{min-height:370px!important;gap:34px!important;padding:35px 30px!important;align-items:center!important}
+.app.blueprint-focus .template-flow-node{flex:0 0 196px!important;width:196px!important;min-height:132px!important;padding:14px!important;border:1px solid #e6d9d1!important;border-radius:8px!important;background:#fff!important;box-shadow:0 2px 7px #5b34200d,0 7px 18px #5b34200a!important}
+.app.blueprint-focus .template-flow-node.trigger{border-radius:18px 18px 18px 6px!important}
+.app.blueprint-focus .template-flow-node.logic{border-radius:12px 3px 12px 3px!important}
+.app.blueprint-focus .template-flow-node.ai{border:2px double #b78acb!important;border-radius:12px 4px 12px 4px!important}
+.app.blueprint-focus .template-flow-node.app{border-radius:5px 12px 5px 12px!important}
+.app.blueprint-focus .template-flow-node.data{border-radius:8px 8px 3px 3px!important}
+.app.blueprint-focus .template-flow-node-icon{width:38px!important;height:38px!important;font-size:19px!important;margin-bottom:8px!important}
+.app.blueprint-focus .template-flow-node-kind{font-size:9px!important}
+.app.blueprint-focus .template-flow-node b{font-size:12px!important;line-height:1.4!important;margin:6px 0!important}
+.app.blueprint-focus .template-flow-node small{font-size:9px!important}
+.app.blueprint-focus .template-flow-link{width:34px!important;flex:0 0 34px!important;background:#d77b52!important}
+.app.blueprint-focus .template-flow-link:after{border-color:#d77b52!important}
+.app.blueprint-focus .template-flow-node:hover,.app.blueprint-focus .template-flow-node.is-active{border-color:#e27c50!important;box-shadow:0 0 0 2px #e27c5022,0 8px 22px #6d392016!important}
+@media(max-width:620px){.canvas#canvas,.canvas{height:calc(100vh - 170px)!important;min-height:520px!important}.canvas .node{width:174px!important;min-height:88px!important;padding:10px!important}.app.blueprint-focus .template-flow-scroll{height:58vh!important;min-height:360px!important;padding:20px 8px!important}.app.blueprint-focus .template-flow-track{gap:24px!important;padding:24px 12px!important}.app.blueprint-focus .template-flow-node{flex-basis:180px!important;width:180px!important;min-height:122px!important}.app.blueprint-focus .template-flow-link{width:24px!important;flex-basis:24px!important}}
+
 </style></head>
 <body><div class="app">
 <aside class="sidebar"><div class="brand"><div class="logo">✦</div><span>AI Studio</span></div>
