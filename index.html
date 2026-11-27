@@ -2038,7 +2038,7 @@ function storeN8nNodeVersion(type){
 function openStoreTemplateN8nEditor(template){
  if(!template){toast('Select an industry agent first.');return}
  const source=industryTemplateWorkflowData(template),stamp=Date.now(),nodes=[],byId={},used={};
- const support=['lmChat','memory','embeddings','vectorStore','toolCalculator','toolHttpRequest','mcpClientTool','toolCode','toolWorkflow'];
+ const support=['lmChat','memory','embeddings','vectorStore','retriever','outputParser','document','textSplitter','toolCalculator','toolHttpRequest','mcpClientTool','toolCode','toolWorkflow'];
  const raw=(source.nodes||[]).map((n,i)=>({source:n,type:n8nTypeForStoreNode(n.type||n.title||n.name),index:i}));
  if(!raw.some(x=>x.type==='@n8n/n8n-nodes-langchain.agent')){const at=raw.findIndex(x=>x.index>0);raw.splice(at<0?Math.min(1,raw.length):at,0,{source:{id:'store-ai-agent',type:'AI Agent',title:'AI Agent',detail:'Reason over the industry context and prepare a structured result'},type:'@n8n/n8n-nodes-langchain.agent',index:-1})}
  if(!raw.some(x=>x.type.includes('.lmChat')))raw.push({source:{id:'store-chat-model',type:'OpenAI Chat Model',title:'OpenAI Chat Model',detail:'Connect a chat model and configure provider credentials'},type:'@n8n/n8n-nodes-langchain.lmChatOpenAi',index:999});
@@ -2060,7 +2060,14 @@ function openStoreTemplateN8nEditor(template){
   }else if(prev){connections[prev.name].main[0]=[{node:aiAgent.name,type:'main',index:0}]}
   else if(next){connections[aiAgent.name].main[0]=[{node:next.name,type:'main',index:0}]}
  }
- if(aiAgent)raw.forEach(item=>{if(item===aiAgent)return;let socket='';if(item.type.includes('.lmChat'))socket='ai_languageModel';else if(item.type.includes('.memory'))socket='ai_memory';else if(item.type.includes('.tool'))socket='ai_tool';else if(item.type.includes('.embeddings'))socket='ai_embedding';else if(item.type.includes('.vectorStore'))socket='ai_vectorStore';else if(item.type.includes('.retriever'))socket='ai_retriever';else if(item.type.includes('.outputParser'))socket='ai_outputParser';if(socket)connections[item.name][socket]=[[{node:aiAgent.name,type:socket,index:0}]]});
+ if(aiAgent){
+  raw.forEach(item=>{if(item===aiAgent)return;let socket='';if(item.type.includes('.lmChat'))socket='ai_languageModel';else if(item.type.includes('.memory'))socket='ai_memory';else if(item.type.includes('.tool'))socket='ai_tool';else if(item.type.includes('.outputParser'))socket='ai_outputParser';if(socket)connections[item.name][socket]=[[{node:aiAgent.name,type:socket,index:0}]]});
+  const embeddings=raw.filter(item=>item.type.includes('.embeddings')),vectors=raw.filter(item=>item.type.includes('.vectorStore')),documents=raw.filter(item=>item.type.includes('.document')),splitters=raw.filter(item=>item.type.includes('.textSplitter')),retrievers=raw.filter(item=>item.type.includes('.retriever'));
+  function connectAiOutput(from,to,socket){if(from&&to)connections[from.name][socket]=[[{node:to.name,type:socket,index:0}]]}
+  vectors.forEach(vector=>{connectAiOutput(embeddings[0],vector,'ai_embedding');connectAiOutput(documents[0],vector,'ai_document')});
+  documents.forEach(documentNode=>connectAiOutput(splitters[0],documentNode,'ai_textSplitter'));
+  retrievers.forEach(retriever=>connectAiOutput(vectors[0],retriever,'ai_vectorStore'));
+}
  const workflow={name:template.name+' · '+template.industry+' workflow',nodes,connections,active:false,settings:{executionOrder:'v1'},meta:{templateKey:template.key,industryId:template.industryId,industryPath:template.industryPath}};
  localStorage.setItem('ai-studio-n8n-editor-handoff',JSON.stringify(workflow));window.open('n8n-workflow-editor.html','_blank','noopener');
 }
