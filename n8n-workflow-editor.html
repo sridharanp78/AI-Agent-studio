@@ -31,14 +31,14 @@ svg.w{position:absolute;inset:0;pointer-events:none}
 svg.w path.e{fill:none;stroke:var(--wire);stroke-width:2}svg.w path.e.run{stroke:var(--ok)}svg.w path.e.sel{stroke:var(--pri);stroke-width:3}
 svg.w path.hit{fill:none;stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:pointer}
 svg.w path.tmp{fill:none;stroke:var(--pri);stroke-width:2;stroke-dasharray:5 4}
-.nw{position:absolute;width:100px;height:100px}
-.n{width:100%;height:100%;background:var(--node);border:2px solid var(--nb);border-radius:12px;display:grid;place-items:center;cursor:grab;padding:0;touch-action:none;transition:border-color .2s,box-shadow .2s}
-.n.trg{border-radius:50px 12px 12px 50px}
+.nw{position:absolute;width:210px;height:145px}
+.n{width:100%;height:100%;background:var(--node);border:1px solid #ead8ce;border-top:4px solid var(--node-accent,var(--pri));border-radius:13px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;cursor:grab;padding:12px 14px;text-align:left;touch-action:none;transition:border-color .2s,box-shadow .2s;box-shadow:0 7px 18px rgba(155,91,37,.07)}
+.n.trg{border-radius:13px}
 .nw:hover .n,.nw.sel .n{border-color:var(--pri)}
 .nw.ran .n{border-color:var(--ok);box-shadow:0 0 0 3px rgba(44,182,125,.2)}
 .nw.dis .n{border-style:dashed;opacity:.55}
-.n svg{width:44px;height:44px;pointer-events:none}.g{font-size:36px;line-height:1;font-weight:600;pointer-events:none}
-.bolt{position:absolute;left:-18px;top:36px;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:12px;display:grid;place-items:center}
+.n svg{width:29px;height:29px;pointer-events:none}.g{font-size:26px;line-height:1;font-weight:600;pointer-events:none}.n-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#fff0e7;color:#bd5735}.node-kind{font-size:9px;line-height:1.1;color:#b56b4d;text-transform:uppercase;letter-spacing:.6px;font-weight:700}.node-title{display:block;width:100%;font-size:12px;line-height:1.25;font-weight:700;color:var(--ink);white-space:normal;overflow-wrap:anywhere}.node-sub{display:block;width:100%;font-size:10px;line-height:1.3;color:var(--mute);white-space:normal;overflow:hidden;max-height:26px}
+.bolt{position:absolute;left:-8px;top:-8px;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:12px;display:grid;place-items:center;z-index:2}
 .ck{position:absolute;right:-7px;bottom:-7px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;display:none;place-items:center}.ran .ck{display:grid}
 .tb{position:absolute;left:50%;top:-36px;transform:translateX(-50%);display:none;background:var(--bar);border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:2px;white-space:nowrap}
 .nw:hover .tb,.nw.sel .tb{display:flex}
@@ -452,7 +452,7 @@ function aiPorts(n){
 }
 function aiPortPoint(n,type,index,dir){
  var p=aiPorts(n),list=dir==="in"?p.inputs:p.outputs,idx=list.indexOf(type),count=list.length;
- return [n.position[0]+OX+100*(idx+1)/(count+1),n.position[1]+OY+100]
+ return [n.position[0]+OX+210*(idx+1)/(count+1),n.position[1]+OY+145]
 }
 function drawAiPorts(n,x,y){
  var p=aiPorts(n);
@@ -567,7 +567,7 @@ function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+M
 var DB={list:[]},CUR=null;
 function loadDB(){var o=null,f=null;try{var t=localStorage.getItem("n8n-cold-mail-v5");if(t){o=JSON.parse(t);if(o&&Array.isArray(o.list))return o}}catch(e){}try{var t4=localStorage.getItem(KEY);if(t4){var q=JSON.parse(t4);if(q&&q.nodes)f=q}}catch(e){}return{list:[{id:uid(),wf:f||clone(SEED),updated:Date.now()}]}}
 function uniq(b){if(!nb(b))return b;var k=1;while(nb(b+k))k++;return b+k}
-function pt(n,i,t,out){return[n.position[0]+OX+(out?100:0),n.position[1]+OY+100*(i+1)/(t+1)]}
+function pt(n,i,t,out){return[n.position[0]+OX+(out?210:0),n.position[1]+OY+145*(i+1)/(t+1)]}
 function tidy(a){var c=S.connections[a];if(!c)return;var m=c.main||[];while(m.length&&!(m[m.length-1]||[]).length)m.pop();if(!m.length)delete S.connections[a]}
 function parentsOf(name){var r=[];eachEdge(function(a,o,k,t){if(t.node===name)r.push({a:a,o:o,i:t.index||0})});return r}
 function sub(n){var p=n.parameters||{},k=skey(n);if(APP[k]&&k!=="postgres"&&k!=="mySql"&&k!=="mongoDb"&&k!=="redis"){var a=APP[k],r=p.resource||a.ord[0],o=p.operation||(a.r[r]||[])[0];return o+": "+r}if(APP[k])return(p.operation||APP[k].r[""][0]);return""}
@@ -620,7 +620,7 @@ function draw(){$("empty").hidden=S.nodes.length>0;
   var f=info(n),x=n.position[0]+OX,y=n.position[1]+OY,nw=document.createElement("div"),ss=nstate(n.name);
   nw.className="nw"+(n.disabled?" dis":"")+(ss?" "+ss:"")+(sel&&sel.k==="n"&&sel.n===n.name?" sel":"");nw.style.left=x+"px";nw.style.top=y+"px";
   var b=document.createElement("button");b.className="n"+(f.c.trg?" trg":"");b.id="n_"+n.id;b.setAttribute("aria-label",n.name+(n.disabled?" (deactivated)":"")+". Press Enter to open");
-  b.innerHTML=(f.c.trg?'<span class="bolt">⚡</span>':"")+icon(f.c);
+  b.style.setProperty("--node-accent",f.c.col||"#df8a61");b.innerHTML=(f.c.trg?'<span class="bolt">⚡</span>':"")+'<span class="n-icon">'+icon(f.c)+'</span><span class="node-kind">'+esc(f.c.l||f.c.g||"NODE")+'</span><strong class="node-title">'+esc(n.name)+'</strong><small class="node-sub">'+esc(sub(n)||f.c.d||"Configure this step")+'</small>';
   b.onpointerdown=function(e){if(pend)return;e.preventDefault();drag={n:n,sx:e.clientX,sy:e.clientY,ox:n.position[0],oy:n.position[1],moved:0,pt:e.pointerType}};
   b.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openNDV(n.name)}};
   var tb=document.createElement("div");tb.className="tb";tb.innerHTML='<button data-a="r" title="Execute step" aria-label="Execute step">▶</button><button data-a="d" title="'+(n.disabled?"Activate":"Deactivate")+'" aria-label="Toggle deactivate">⏻</button><button data-a="x" title="Delete" aria-label="Delete node">✕</button>';
@@ -628,7 +628,7 @@ function draw(){$("empty").hidden=S.nodes.length>0;
   tb.onclick=function(e){var a=e.target.dataset.a;if(a==="x")delNode(n.name);else if(a==="d"){n.disabled=!n.disabled;save();draw()}else if(a==="r"){execStep(n.name);ORDER.forEach(function(q){vis[q]=1});draw()}};
   var ck=document.createElement("span");ck.className="ck";ck.textContent=ss==="err"?"!":(S.pinData&&S.pinData[n.name]?"◆":"✓");
   nw.appendChild(b);nw.appendChild(tb);nw.appendChild(ck);st.appendChild(nw);
-  el("cap","<b>"+esc(n.name)+"</b>"+(sub(n)?"<span>"+esc(sub(n))+"</span>":""),x-25,y+108);
+  
   for(var i=0;i<f.ins;i++){var p=pt(n,i,f.ins,0),d=el("pin in","",p[0],p[1]);d.setAttribute("aria-label","Input "+(i+1)+" of "+n.name);if(f.ins>1){var lb=el("pl l","Input "+(i+1),p[0]-52,p[1]-8)}(function(i){d.onpointerdown=function(e){e.stopPropagation();if(pend){connect(pend.n,pend.o,n.name,i);pend=null;hint()}}})(i)}
   for(var j=0;j<f.outs.length;j++){var q=pt(n,j,f.outs.length,1),o=el("pin out"+(pend&&pend.n===n.name&&pend.o===j?" on":""),"",q[0],q[1]);o.setAttribute("aria-label","Output "+(f.outs[j]||j+1)+" of "+n.name);
    if(f.outs[j])el("pl",esc(f.outs[j]),q[0]+10,q[1]-18);
