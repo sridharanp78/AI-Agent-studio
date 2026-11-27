@@ -312,6 +312,11 @@ var CATS=[
 "@n8n/n8n-nodes-langchain.toolCalculator|Calculator Tool|＋|Give an AI agent calculator access|o=",
 "@n8n/n8n-nodes-langchain.toolHttpRequest|HTTP Request Tool|↔|Expose HTTP requests as an AI tool|o="
 ]]
+,
+["AI classification and extraction","#10a37f",[
+"@n8n/n8n-nodes-langchain.textClassifier|Text Classifier|TC|Classify text into defined categories",
+"@n8n/n8n-nodes-langchain.informationExtractor|Information Extractor|IE|Extract structured fields from text"
+]]
 
 ];
 /* Keep one palette entry per canonical n8n node type. */
@@ -435,7 +440,7 @@ function aiPorts(n){
  var t=n.type||"",k=t.split(".").pop(),I=[],O=[];
  if(k==="agent")I=["ai_languageModel","ai_tool","ai_memory","ai_outputParser"];
  if(k==="lmChatOpenAi"||k==="lmChatAnthropic"||k==="lmChatGoogleGemini"||k==="lmChatOllama"||k==="lmChatAzureOpenAi"||k==="lmChatGroq")O=["ai_languageModel"];
- if(k==="toolCalculator"||k==="toolHttpRequest"||k==="toolCode"||k==="toolWorkflow"||k==="toolSerpApi"||k==="toolWikipedia"||k==="toolVectorStore")O=["ai_tool"];
+ if(k==="toolCalculator"||k==="toolHttpRequest"||k==="toolCode"||k==="toolWorkflow"||k==="toolSerpApi"||k==="toolWikipedia"||k==="toolVectorStore"||k==="mcpClientTool")O=["ai_tool"];
  if(k.indexOf("memory")===0)O=["ai_memory"];
  if(k.indexOf("embeddings")===0)O=["ai_embedding"];
  if(k.indexOf("vectorStore")===0){I=["ai_embedding"];O=["ai_vectorStore"]}
