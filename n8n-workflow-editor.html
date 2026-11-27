@@ -970,7 +970,7 @@ function tidyLayout(){
  if(!q.length){lvl[S.nodes[0].name]=0;q.push(S.nodes[0].name)}
  while(q.length){var a=q.shift();((S.connections[a]||{main:[]}).main||[]).forEach(function(arr){(arr||[]).forEach(function(t){if(lvl[t.node]===undefined){lvl[t.node]=lvl[a]+1;q.push(t.node)}})})}
  var cols={};S.nodes.forEach(function(n){var l=lvl[n.name];if(l===undefined)l=0;(cols[l]=cols[l]||[]).push(n)});
- Object.keys(cols).forEach(function(l){var c=cols[l].sort(function(a,b){return a.position[1]-b.position[1]});c.forEach(function(n,i){n.position=[+l*200,Math.round(((i-(c.length-1)/2)*160)/8)*8]})});
+ Object.keys(cols).forEach(function(l){var c=cols[l].sort(function(a,b){return a.position[1]-b.position[1]});c.forEach(function(n,i){n.position=[+l*240,Math.round(((i-(c.length-1)/2)*160)/8)*8]})});
  save();fit()}
 $("zt").onclick=tidyLayout;
 </script>
