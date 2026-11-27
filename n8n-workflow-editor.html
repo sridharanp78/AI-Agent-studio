@@ -964,14 +964,38 @@ $("bHome").onclick=goHome;$("bStudioHome").onclick=function(){location.href="ind
 $("mNew").onclick=function(){$("menu").hidden=true;save();createWf()};$("mDup").onclick=function(){$("menu").hidden=true;dupWf(CUR.id)};$("mDel").onclick=function(){$("menu").hidden=true;delWf(CUR.id)};
 $("empty").onclick=function(){addFrom=null;openNC()};
 function tidyLayout(){
- if(!S.nodes.length)return;var lvl={},par={},q=[];
- S.nodes.forEach(function(n){par[n.name]=0});eachEdge(function(a,o,k,t){par[t.node]=(par[t.node]||0)+1});
- S.nodes.forEach(function(n){if(!par[n.name]||info(n).c.trg){lvl[n.name]=0;q.push(n.name)}});
- if(!q.length){lvl[S.nodes[0].name]=0;q.push(S.nodes[0].name)}
- while(q.length){var a=q.shift();((S.connections[a]||{main:[]}).main||[]).forEach(function(arr){(arr||[]).forEach(function(t){if(lvl[t.node]===undefined){lvl[t.node]=lvl[a]+1;q.push(t.node)}})})}
- var cols={};S.nodes.forEach(function(n){var l=lvl[n.name];if(l===undefined)l=0;(cols[l]=cols[l]||[]).push(n)});
- Object.keys(cols).forEach(function(l){var c=cols[l].sort(function(a,b){return a.position[1]-b.position[1]});c.forEach(function(n,i){n.position=[+l*240,Math.round(((i-(c.length-1)/2)*160)/8)*8]})});
- save();fit()}
+ if(!S.nodes.length)return;
+ var lvl={},parents={},children={},queue=[];
+ S.nodes.forEach(function(n){parents[n.name]=0;children[n.name]=[]});
+ function addRelation(a,t){
+  if(!children[a]||!Object.prototype.hasOwnProperty.call(parents,t.node))return;
+  children[a].push(t.node);parents[t.node]++;
+ }
+ eachEdge(function(a,o,k,t){addRelation(a,t)});
+ eachTypedEdge(function(a,type,o,k,t){addRelation(a,t)});
+ S.nodes.forEach(function(n){
+  if(!parents[n.name]||info(n).c.trg){lvl[n.name]=0;queue.push(n.name)}
+ });
+ if(!queue.length){lvl[S.nodes[0].name]=0;queue.push(S.nodes[0].name)}
+ while(queue.length){
+  var a=queue.shift();
+  (children[a]||[]).forEach(function(target){
+   if(lvl[target]===undefined){lvl[target]=lvl[a]+1;queue.push(target)}
+  });
+ }
+ var cols={};
+ S.nodes.forEach(function(n){
+  var level=lvl[n.name];if(level===undefined)level=0;
+  (cols[level]=cols[level]||[]).push(n);
+ });
+ Object.keys(cols).forEach(function(level){
+  var col=cols[level].sort(function(a,b){return a.position[1]-b.position[1]});
+  col.forEach(function(n,i){
+   n.position=[+level*240,Math.round(((i-(col.length-1)/2)*184)/8)*8]
+  });
+ });
+ save();fit();
+}
 $("zt").onclick=tidyLayout;
 </script>
 </body>
