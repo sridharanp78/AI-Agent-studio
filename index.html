@@ -1930,7 +1930,7 @@ function blueprintGraphMarkup(nodes,links,mode){
  const ids=list.map((n,i)=>String(n.id??n.nodeId??i)),index=new Map(ids.map((id,i)=>[id,i])),depth=list.map(()=>null),rows=list.map(()=>0),incoming=list.map(()=>0);
  edges.forEach(e=>{const a=index.get(String(e.from??e.source??e.sourceNode??'')),b=index.get(String(e.to??e.target??e.targetNode??''));if(a!==undefined&&b!==undefined)incoming[b]++});
  const queue=[];incoming.forEach((v,i)=>{if(v===0){depth[i]=0;queue.push(i)}});
- for(let q=0;q<queue.length;q++){const a=queue[q];edges.forEach(e=>{if(index.get(String(e.from??e.source??e.sourceNode??''))!==a)return;const b=index.get(String(e.to??e.target??e.targetNode??''));if(b===undefined)return;const next=(depth[a]||0)+1;if(depth[b]===null||depth[b]<next){depth[b]=next;queue.push(b)}})}
+ for(let q=0;q<queue.length;q++){const a=queue[q];edges.forEach(e=>{if(index.get(String(e.from??e.source??e.sourceNode??''))!==a)return;const b=index.get(String(e.to??e.target??e.targetNode??''));if(b===undefined||depth[b]!==null)return;depth[b]=(depth[a]||0)+1;queue.push(b)})}
  let last=Math.max(0,...depth.filter(v=>v!==null));depth.forEach((v,i)=>{if(v===null)depth[i]=++last});
  const layerRows=new Map();depth.forEach((d,i)=>{rows[i]=layerRows.get(d)||0;layerRows.set(d,rows[i]+1)});
  const maxLayer=Math.max(0,...depth),maxRows=Math.max(1,...layerRows.values()),width=40+(maxLayer+1)*(nodeW+gapX)-gapX,height=40+maxRows*(nodeH+gapY)-gapY;
