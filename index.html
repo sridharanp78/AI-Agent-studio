@@ -2260,10 +2260,13 @@ const initialHash=location.hash.slice(1),[initialPage,initialQuery='']=initialHa
  function bindWorkflowConnectorEvents(){
   if(document.documentElement.dataset.workflowConnectorDelegationReady==='1')return;
   document.documentElement.dataset.workflowConnectorDelegationReady='1';
+  document.addEventListener('pointerdown',function(event){const port=event.target.closest('.node-output-port,.node-ai-output-port');if(!port||!port.closest('#canvas'))return;const node=port.closest('.node');if(!node)return;connectMode=true;connectStart=node;connectBranch=String(port.dataset.branch||'');connectType=String(port.dataset.connectionType||'');clearConnectionHighlights();node.classList.add('connection-source');const canvas=port.closest('#canvas');canvas.querySelectorAll('.node').forEach(target=>{if(target!==node&&(!connectType||target.querySelector('.node-ai-input-port[data-connection-type="'+connectType+'"]')))target.classList.add('connection-target-candidate')});const hint=document.getElementById('connectHint');if(hint)hint.textContent='Drag this output to a destination input to connect the nodes.'},true);
+  document.addEventListener('pointerup',function(event){const port=event.target.closest('.node-input-port,.node-ai-input-port');if(!port||!port.closest('#canvas')||!connectStart)return;const node=port.closest('.node');if(!node||node===connectStart)return;event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();port.dataset.dragConnectHandled='1';chooseWorkflowNode(node,String(port.dataset.connectionType||''))},true);
   document.addEventListener('click',function(event){
    const port=event.target.closest('.node-output-port,.node-input-port,.node-ai-output-port,.node-ai-input-port');
    const canvas=port?.closest('#canvas');
    if(!port||!canvas)return;
+   if(port.dataset.dragConnectHandled){delete port.dataset.dragConnectHandled;event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();return}
    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
    const node=port.closest('.node');if(!node)return;
    if(port.classList.contains('node-output-port')){
